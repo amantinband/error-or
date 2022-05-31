@@ -1,0 +1,66 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# SA1615: Element return value should be documented.
+dotnet_diagnostic.SA1615.severity = none
+
+# SA1611: Element parameters must be documented.
+dotnet_diagnostic.SA1611.severity = none
+
+# SA1633: File must have header.
+dotnet_diagnostic.SA1633.severity = none
+
+# SA1633: Generic type parameters must be documented.
+dotnet_diagnostic.SA1618.severity = none
+
+# SA1133: Each attribute should be placed in its own set of square brackets.
+dotnet_diagnostic.SA1133.severity = none
+
+# SA1600: Elements must be documented.
+dotnet_diagnostic.SA1600.severity = none
+
+# SA1601: Partial elementes should be documented.
+dotnet_diagnostic.SA1601.severity = none
+
+# SA1313: Parameter names must begin with lower case letter.
+dotnet_diagnostic.SA1313.severity = none
+
+# SA1009: Closing parenthesis should be followed by a space.
+dotnet_diagnostic.SA1009.severity = none
+
+# SA1000: The keyword 'new' should be followed by a space.
+dotnet_diagnostic.SA1000.severity = none
+
+# SA1101: Prefix local calls with this.
+dotnet_diagnostic.SA1101.severity = none
+
+# SA1309: Field should not begin with an underscore.
+dotnet_diagnostic.SA1309.severity = none
+
+# SA1602: Enumeration items should be documented.
+dotnet_diagnostic.SA1602.severity = none
+
+# CS1591: Missing XML comment for publicly visible type or member.
+dotnet_diagnostic.CS1591.severity = none
+
+# SA1200: Using directive should appear within a namespace declaration.
+dotnet_diagnostic.SA1200.severity = none
+
+# IDE0008: Use explicit type
+csharp_style_var_when_type_is_apparent = true
+
+# IDE0130: Namespace does not match folder structure
+dotnet_style_namespace_match_folder = false
+
+# IDE0023: Use block body for operators
+csharp_style_expression_bodied_operators = when_on_single_line
+
+# IDE0130: Namespace does not match folder structure
+dotnet_diagnostic.IDE0130.severity = none

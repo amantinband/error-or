@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>ErrorOr</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Amichai Mantinband</Authors>
+    <PackageIcon>icon-square.png</PackageIcon>
+    <PackageTags>Result,Results,ErrorOr,Error,Handling</PackageTags>
+    <Description>A simple, fluent discriminated union of an error or a result.</Description>
+    <PackageProjectUrl>https://github.com/mantinband/error-or</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <licenses>https://opensource.org/licenses/MIT</licenses>
+    <RepositoryUrl>https://github.com/mantinband/error-or</RepositoryUrl>
+    <PackageOutputPath>../artifacts/</PackageOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../assets/icon-square.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="stylecop.json" />
+    <AdditionalFiles Include="stylecop.json" />
+  </ItemGroup>
+
+</Project>

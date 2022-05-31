@@ -142,7 +142,7 @@ public class User
 ```
 
 ```csharp
-public ErrorOr<User> CreateUser(string name)
+public async Task<ErrorOr<User>> CreateUserAsync(string name)
 {
     if (await _userRepository.GetAsync(name) is User user)
     {

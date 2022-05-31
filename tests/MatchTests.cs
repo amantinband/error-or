@@ -5,6 +5,8 @@ namespace Tests;
 
 public class MatchTests
 {
+    private record Person(string Name);
+
     [Fact]
     public void MatchErrorOr_WhenHasValue_ShouldExecuteOnValueAction()
     {
@@ -93,6 +95,4 @@ public class MatchTests
         // Assert
         action.Should().NotThrow().Subject.Should().Be("Nice");
     }
-
-    private record Person(string Name);
 }

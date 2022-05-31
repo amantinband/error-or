@@ -5,6 +5,8 @@ using FluentAssertions;
 
 public class ErrorOrTests
 {
+    private record Person(string Name);
+
     [Fact]
     public void ImplicitCastResult_WhenAccessingResult_ShouldReturnValue()
     {
@@ -112,6 +114,4 @@ public class ErrorOrTests
         errorOrPerson.IsError.Should().BeTrue();
         errorOrPerson.FirstError.Should().Be(errors[0]);
     }
-
-    private record Person(string Name);
 }

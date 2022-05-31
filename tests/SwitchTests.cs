@@ -5,6 +5,8 @@ namespace Tests;
 
 public class SwitchTests
 {
+    private record Person(string Name);
+
     [Fact]
     public void SwitchErrorOr_WhenHasValue_ShouldExecuteOnValueAction()
     {
@@ -74,6 +76,4 @@ public class SwitchTests
         // Assert
         action.Should().NotThrow();
     }
-
-    private record Person(string Name);
 }

@@ -3,9 +3,9 @@
 /// <summary>
 /// A discriminated union of errors or a value.
 /// </summary>
-public record struct ErrorOr<TResult>
+public record struct ErrorOr<TValue>
 {
-    private readonly TResult? _result = default;
+    private readonly TValue? _value = default;
     private readonly List<Error>? _errors = null;
 
     /// <summary>
@@ -30,18 +30,18 @@ public record struct ErrorOr<TResult>
     }
 
     /// <summary>
-    /// Gets the result.
+    /// Gets the value.
     /// </summary>
-    public TResult Result
+    public TValue Value
     {
         get
         {
             if (IsError)
             {
-                throw new InvalidOperationException("Result can be retrieved only when the result not an error.");
+                throw new InvalidOperationException("Value can be retrieved only when the result is not an error.");
             }
 
-            return _result!;
+            return _value!;
         }
     }
 
@@ -73,33 +73,75 @@ public record struct ErrorOr<TResult>
         IsError = true;
     }
 
-    private ErrorOr(TResult result)
+    private ErrorOr(TValue value)
     {
-        _result = result;
+        _value = value;
         IsError = false;
     }
 
     /// <summary>
-    /// Creates an <see cref="ErrorOr{TResult}"/> from a result.
+    /// Creates an <see cref="ErrorOr{TValue}"/> from a value.
     /// </summary>
-    public static implicit operator ErrorOr<TResult>(TResult result)
+    public static implicit operator ErrorOr<TValue>(TValue value)
     {
-        return new ErrorOr<TResult>(result);
+        return new ErrorOr<TValue>(value);
     }
 
     /// <summary>
-    /// Creates an <see cref="ErrorOr{TResult}"/> from an error.
+    /// Creates an <see cref="ErrorOr{TValue}"/> from an error.
     /// </summary>
-    public static implicit operator ErrorOr<TResult>(Error error)
+    public static implicit operator ErrorOr<TValue>(Error error)
     {
-        return new ErrorOr<TResult>(error);
+        return new ErrorOr<TValue>(error);
     }
 
     /// <summary>
-    /// Creates an <see cref="ErrorOr{TResult}"/> from a list of errors.
+    /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
     /// </summary>
-    public static implicit operator ErrorOr<TResult>(List<Error> errors)
+    public static implicit operator ErrorOr<TValue>(List<Error> errors)
     {
-        return new ErrorOr<TResult>(errors);
+        return new ErrorOr<TValue>(errors);
+    }
+
+    public void Switch(Action<TValue> onValue, Action<IReadOnlyList<Error>> onError)
+    {
+        if (IsError)
+        {
+            onError(Errors);
+            return;
+        }
+
+        onValue(Value);
+    }
+
+    public void SwitchFirst(Action<TValue> onValue, Action<Error> onFirstError)
+    {
+        if (IsError)
+        {
+            onFirstError(FirstError);
+            return;
+        }
+
+        onValue(Value);
+    }
+
+    public TResult Match<TResult>(Func<TValue, TResult> onValue, Func<IReadOnlyList<Error>, TResult> onError)
+    {
+        if (IsError)
+        {
+            return onError(Errors);
+        }
+
+        return onValue(Value);
+    }
+
+    public TResult MatchFirst<TResult>(Func<TValue, TResult> onValue, Func<Error, TResult> onFirstError)
+    {
+        if (IsError)
+        {
+            return onFirstError(FirstError);
+        }
+
+        return onValue(Value);
     }
 }

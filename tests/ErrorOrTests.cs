@@ -16,7 +16,7 @@ public class ErrorOrTests
 
         // Assert
         errorOr.IsError.Should().BeFalse();
-        errorOr.Result.Should().Be(result);
+        errorOr.Value.Should().Be(result);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class ErrorOrTests
 
         // Assert
         errorOrInt.IsError.Should().BeFalse();
-        errorOrInt.Result.Should().Be(result);
+        errorOrInt.Value.Should().Be(result);
     }
 
     [Fact]
@@ -112,6 +112,6 @@ public class ErrorOrTests
         errorOrPerson.IsError.Should().BeTrue();
         errorOrPerson.FirstError.Should().Be(errors[0]);
     }
-}
 
-internal record Person(string Name);
+    private record Person(string Name);
+}

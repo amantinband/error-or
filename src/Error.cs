@@ -32,7 +32,9 @@ public record struct Error
     /// </summary>
     /// <param name="code">The unique error code.</param>
     /// <param name="description">The error description.</param>
-    public static Error Failure(string code, string description) =>
+    public static Error Failure(
+        string code = "General.Failure",
+        string description = "A failure has occurred.") =>
         new(code, description, ErrorType.Failure);
 
     /// <summary>
@@ -50,7 +52,9 @@ public record struct Error
     /// </summary>
     /// <param name="code">The unique error code.</param>
     /// <param name="description">The error description.</param>
-    public static Error Validation(string code, string description) =>
+    public static Error Validation(
+        string code = "General.Validation",
+        string description = "A validation error has occurred.") =>
         new(code, description, ErrorType.Validation);
 
     /// <summary>
@@ -58,7 +62,9 @@ public record struct Error
     /// </summary>
     /// <param name="code">The unique error code.</param>
     /// <param name="description">The error description.</param>
-    public static Error Conflict(string code, string description) =>
+    public static Error Conflict(
+        string code = "General.Conflict",
+        string description = "A conflict error has occurred.") =>
         new(code, description, ErrorType.Conflict);
 
     /// <summary>
@@ -66,6 +72,8 @@ public record struct Error
     /// </summary>
     /// <param name="code">The unique error code.</param>
     /// <param name="description">The error description.</param>
-    public static Error NotFound(string code, string description) =>
+    public static Error NotFound(
+        string code = "General.NotFound",
+        string description = "A 'Not Found' error has occurred.") =>
         new(code, description, ErrorType.NotFound);
 }

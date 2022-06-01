@@ -111,7 +111,7 @@ public record struct ErrorOr<TValue>
         return new ErrorOr<TValue>(errors.ToList());
     }
 
-    public void Switch(Action<TValue> onValue, Action<IReadOnlyList<Error>> onError)
+    public void Switch(Action<TValue> onValue, Action<List<Error>> onError)
     {
         if (IsError)
         {
@@ -133,7 +133,7 @@ public record struct ErrorOr<TValue>
         onValue(Value);
     }
 
-    public TResult Match<TResult>(Func<TValue, TResult> onValue, Func<IReadOnlyList<Error>, TResult> onError)
+    public TResult Match<TResult>(Func<TValue, TResult> onValue, Func<List<Error>, TResult> onError)
     {
         if (IsError)
         {

@@ -131,10 +131,46 @@ public class ErrorOrTests
     }
 
     [Fact]
+    public void ImplicitCastErrorArray_WhenAccessingErrors_ShouldReturnErrorArray()
+    {
+        // Arrange
+        var errors = new[]
+        {
+            Error.Validation("User.Name", "Name is too short"),
+            Error.Validation("User.Age", "User is too young"),
+        };
+
+        // Act
+        ErrorOr<Person> errorOrPerson = errors;
+
+        // Assert
+        errorOrPerson.IsError.Should().BeTrue();
+        errorOrPerson.Errors.Should().HaveCount(errors.Length).And.BeEquivalentTo(errors);
+    }
+
+    [Fact]
     public void ImplicitCastErrorList_WhenAccessingFirstError_ShouldReturnFirstError()
     {
         // Arrange
         var errors = new List<Error>
+        {
+            Error.Validation("User.Name", "Name is too short"),
+            Error.Validation("User.Age", "User is too young"),
+        };
+
+        // Act
+        ErrorOr<Person> errorOrPerson = errors;
+
+        // Assert
+        errorOrPerson.IsError.Should().BeTrue();
+        errorOrPerson.FirstError.Should().Be(errors[0]);
+    }
+
+    [Fact]
+    public void ImplicitCastErrorArray_WhenAccessingFirstError_ShouldReturnFirstError()
+    {
+        // Arrange
+        var errors = new[]
         {
             Error.Validation("User.Name", "Name is too short"),
             Error.Validation("User.Age", "User is too young"),

@@ -16,7 +16,7 @@ public record struct ErrorOr<TValue>
     /// <summary>
     /// Gets the list of errors.
     /// </summary>
-    public IReadOnlyList<Error> Errors
+    public List<Error> Errors
     {
         get
         {
@@ -25,7 +25,7 @@ public record struct ErrorOr<TValue>
                 throw new InvalidOperationException("Errors can be retrieved only when the result is an error.");
             }
 
-            return _errors!.AsReadOnly();
+            return _errors!;
         }
     }
 
@@ -101,6 +101,14 @@ public record struct ErrorOr<TValue>
     public static implicit operator ErrorOr<TValue>(List<Error> errors)
     {
         return new ErrorOr<TValue>(errors);
+    }
+
+    /// <summary>
+    /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
+    /// </summary>
+    public static implicit operator ErrorOr<TValue>(Error[] errors)
+    {
+        return new ErrorOr<TValue>(errors.ToList());
     }
 
     public void Switch(Action<TValue> onValue, Action<IReadOnlyList<Error>> onError)

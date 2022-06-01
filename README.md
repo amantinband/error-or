@@ -21,6 +21,8 @@
   - [Single Error](#single-error)
     - [This 👇🏽](#this-)
     - [Turns into this 👇🏽](#turns-into-this-)
+    - [This 👇🏽](#this--1)
+    - [Turns into this 👇🏽](#turns-into-this--1)
   - [Multiple Errors](#multiple-errors)
 - [A more practical example](#a-more-practical-example)
   - [Dropping the exceptions throwing logic](#dropping-the-exceptions-throwing-logic)
@@ -39,6 +41,9 @@
     - [`MatchFirst`](#matchfirst)
     - [`Switch`](#switch)
     - [`SwitchFirst`](#switchfirst)
+  - [Error Types](#error-types)
+    - [Why would I want to categorize my errors?](#why-would-i-want-to-categorize-my-errors)
+  - [Built in result types](#built-in-result-types)
 - [How Is This Different From `OneOf<T0, T1>` or `FluentResults`?](#how-is-this-different-from-oneoft0-t1-or-fluentresults)
 - [Contribution](#contribution)
 - [Credits](#credits)
@@ -96,6 +101,32 @@ ErrorOr<User> GetUser(Guid id = default)
 errorOrUser.SwitchFirst(
     user => Console.WriteLine(user.Name),
     error => Console.WriteLine(error.Description));
+```
+
+### This 👇🏽
+
+```csharp
+void AddUser(User user)
+{
+    if (!_users.TryAdd(user))
+    {
+        throw new Exception("Failed to add user");
+    }
+}
+```
+
+### Turns into this 👇🏽
+
+```csharp
+ErrorOr<Created> AddUser(User user)
+{
+    if (!_users.TryAdd(user))
+    {
+        return Error.Failure(description: "Failed to add user");
+    }
+
+    return Results.Created;
+}
 ```
 
 ## Multiple Errors
@@ -353,6 +384,101 @@ Actions that don't return a value on the value or first error
 errorOrString.SwitchFirst(
     value => Console.WriteLine(value),
     firstError => Console.WriteLine(firstError.Description));
+```
+
+## Error Types
+
+Each error has a type out of the following options:
+
+```csharp
+public enum ErrorType
+{
+    Failure,
+    Unexpected,
+    Validation,
+    Conflict,
+    NotFound,
+}
+```
+
+Creating a new Error instance is done using one of the following static methods:
+
+```csharp
+public static Error Error.Failure(string code, string description);
+public static Error Error.Unexpected(string code, string description);
+public static Error Error.Validation(string code, string description);
+public static Error Error.Conflict(string code, string description);
+public static Error Error.NotFound(string code, string description);
+```
+
+The `ErrorType` enum is a good way to categorize errors.
+
+### Why would I want to categorize my errors?
+
+If you are developing a web API, it can be useful to be able to associate the type of error that occurred to the HTTP status code that should be returned.
+
+If you don't want to categorize your errors, simply use the `Error.Failure` static method.
+
+A nice approach, is creating a static class with the expected errors. For example:
+
+```csharp
+public static partial class Errors
+{
+    public static class User
+    {
+        public static Error NotFound = Error.NotFound("User.NotFound", "User not found.");
+        public static Error DuplicateEmail = Error.Conflict("User.DuplicateEmail", "User with given email already exists.");
+    }
+}
+```
+
+Which can later be used as following
+
+```csharp
+
+User newUser = ..;
+if (await _userRepository.GetByEmailAsync(newUser.email) is not null)
+{
+    return Errors.User.DuplicateEmail;
+}
+
+await _userRepository.AddAsync(newUser);
+return newUser;
+```
+
+Then, in an outer layer, you can use the `Error.Match` method to return the appropriate HTTP status code.
+
+```csharp
+return createUserResult.MatchFirst(
+    user => CreatedAtRoute("GetUser", new { id = user.Id }, user),
+    error => error is Errors.User.DuplicateEmail ? Conflict() : InternalServerError());
+```
+
+## Built in result types
+
+There are a few built in result types:
+
+```csharp
+ErrorOr<Success> result = Results.Success;
+ErrorOr<Created> result = Results.Created;
+ErrorOr<Updated> result = Results.Updated;
+ErrorOr<Deleted> result = Results.Deleted;
+```
+
+Which can be used as following
+
+```csharp
+ErrorOr<Deleted> DeleteUser(Guid id)
+{
+    var user = await _userRepository.GetByIdAsync(id);
+    if (user is null)
+    {
+        return Error.NotFound(code: "User.NotFound", description: "User not found.");
+    }
+
+    await _userRepository.DeleteAsync(user);
+    return Results.Deleted;
+}
 ```
 
 # How Is This Different From `OneOf<T0, T1>` or `FluentResults`?

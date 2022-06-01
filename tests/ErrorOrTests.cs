@@ -24,11 +24,8 @@ public class ErrorOrTests
     [Fact]
     public void ImplicitCastResult_WhenAccessingError_ShouldThrow()
     {
-        // Arrange
-        var result = new Person("Amichai");
-
         // Act
-        ErrorOr<Person> errorOrPerson = result;
+        ErrorOr<Person> errorOrPerson = new Person("Amichai");
         var accessErrorsAction = () => errorOrPerson.Errors;
         var accessFirstErrorAction = () => errorOrPerson.FirstError;
 
@@ -52,6 +49,29 @@ public class ErrorOrTests
     }
 
     [Fact]
+    public void ImplicitCastErrorOrType_WhenAccessingResult_ShouldReturnValue()
+    {
+        // Act
+        ErrorOr<Success> errorOrSuccess = Result.Success;
+        ErrorOr<Created> errorOrCreated = Result.Created;
+        ErrorOr<Deleted> errorOrDeleted = Result.Deleted;
+        ErrorOr<Updated> errorOrUpdated = Result.Updated;
+
+        // Assert
+        errorOrSuccess.IsError.Should().BeFalse();
+        errorOrSuccess.Value.Should().Be(Result.Success);
+
+        errorOrCreated.IsError.Should().BeFalse();
+        errorOrCreated.Value.Should().Be(Result.Created);
+
+        errorOrDeleted.IsError.Should().BeFalse();
+        errorOrDeleted.Value.Should().Be(Result.Deleted);
+
+        errorOrUpdated.IsError.Should().BeFalse();
+        errorOrUpdated.Value.Should().Be(Result.Updated);
+    }
+
+    [Fact]
     public void ImplicitCastSingleError_WhenAccessingErrors_ShouldReturnErrorList()
     {
         // Arrange
@@ -63,6 +83,19 @@ public class ErrorOrTests
         // Assert
         errorOrPerson.IsError.Should().BeTrue();
         errorOrPerson.Errors.Should().ContainSingle().Which.Should().Be(error);
+    }
+
+    [Fact]
+    public void ImplicitCastError_WhenAccessingValue_ShouldThrow()
+    {
+        // Arrange
+        ErrorOr<Person> errorOrPerson = Error.Validation("User.Name", "Name is too short");
+
+        // Act
+        var action = () => errorOrPerson.Value;
+
+        // Assert
+        action.Should().ThrowExactly<InvalidOperationException>();
     }
 
     [Fact]

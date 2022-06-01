@@ -459,10 +459,10 @@ return createUserResult.MatchFirst(
 There are a few built in result types:
 
 ```csharp
-ErrorOr<Success> result = Results.Success;
-ErrorOr<Created> result = Results.Created;
-ErrorOr<Updated> result = Results.Updated;
-ErrorOr<Deleted> result = Results.Deleted;
+ErrorOr<Success> result = Result.Success;
+ErrorOr<Created> result = Result.Created;
+ErrorOr<Updated> result = Result.Updated;
+ErrorOr<Deleted> result = Result.Deleted;
 ```
 
 Which can be used as following
@@ -477,7 +477,7 @@ ErrorOr<Deleted> DeleteUser(Guid id)
     }
 
     await _userRepository.DeleteAsync(user);
-    return Results.Deleted;
+    return Result.Deleted;
 }
 ```
 

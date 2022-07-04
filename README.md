@@ -25,7 +25,7 @@
     - [Turns into this 👇🏽](#turns-into-this--1)
   - [Multiple Errors](#multiple-errors)
 - [A more practical example](#a-more-practical-example)
-  - [Dropping the exceptions throwing logic](#dropping-the-exceptions-throwing-logic)
+- [Dropping the exceptions throwing logic](#dropping-the-exceptions-throwing-logic)
 - [Usage](#usage)
   - [Creating an `ErrorOr<result>`](#creating-an-errororresult)
     - [From Value](#from-value)
@@ -209,8 +209,42 @@ public async Task<IActionResult> GetUser(Guid Id)
         errors => ValidationProblem(errors.ToModelStateDictionary()));
 }
 ```
+A nice approach, is creating a static class with the expected errors. For example:
 
-## Dropping the exceptions throwing logic
+```csharp
+public static partial class Errors
+{
+    public static class User
+    {
+        public static Error NotFound = Error.NotFound("User.NotFound", "User not found.");
+        public static Error DuplicateEmail = Error.Conflict("User.DuplicateEmail", "User with given email already exists.");
+    }
+}
+```
+
+Which can later be used as following
+
+```csharp
+
+User newUser = ..;
+if (await _userRepository.GetByEmailAsync(newUser.email) is not null)
+{
+    return Errors.User.DuplicateEmail;
+}
+
+await _userRepository.AddAsync(newUser);
+return newUser;
+```
+
+Then, in an outer layer, you can use the `Error.Match` method to return the appropriate HTTP status code.
+
+```csharp
+return createUserResult.MatchFirst(
+    user => CreatedAtRoute("GetUser", new { id = user.Id }, user),
+    error => error is Errors.User.DuplicateEmail ? Conflict() : InternalServerError());
+```
+
+# Dropping the exceptions throwing logic
 
 You have validation logic such as `MediatR` behaviors, you can drop the exceptions throwing logic and simply return a list of errors from the pipeline behavior
 
@@ -415,11 +449,13 @@ public static Error Error.Conflict(string code, string description);
 public static Error Error.NotFound(string code, string description);
 ```
 
+The `ErrorType` enum is a good way to categorize errors.
+
 ### Custom error types
 
-You can create your own result types if you would like to categorize your errors differently.
+You can create your own error types if you would like to categorize your errors differently.
 
-A custom error type can be created with the `Custom` status method
+A custom error type can be created with the `Custom` static method
 
 ```csharp
 public static class MyErrorTypes
@@ -443,48 +479,11 @@ var errorMessage = Error.NumericType switch
 };
 ```
 
-The `ErrorType` enum is a good way to categorize errors.
-
 ### Why would I want to categorize my errors?
 
 If you are developing a web API, it can be useful to be able to associate the type of error that occurred to the HTTP status code that should be returned.
 
 If you don't want to categorize your errors, simply use the `Error.Failure` static method.
-
-A nice approach, is creating a static class with the expected errors. For example:
-
-```csharp
-public static partial class Errors
-{
-    public static class User
-    {
-        public static Error NotFound = Error.NotFound("User.NotFound", "User not found.");
-        public static Error DuplicateEmail = Error.Conflict("User.DuplicateEmail", "User with given email already exists.");
-    }
-}
-```
-
-Which can later be used as following
-
-```csharp
-
-User newUser = ..;
-if (await _userRepository.GetByEmailAsync(newUser.email) is not null)
-{
-    return Errors.User.DuplicateEmail;
-}
-
-await _userRepository.AddAsync(newUser);
-return newUser;
-```
-
-Then, in an outer layer, you can use the `Error.Match` method to return the appropriate HTTP status code.
-
-```csharp
-return createUserResult.MatchFirst(
-    user => CreatedAtRoute("GetUser", new { id = user.Id }, user),
-    error => error is Errors.User.DuplicateEmail ? Conflict() : InternalServerError());
-```
 
 ## Built in result types
 

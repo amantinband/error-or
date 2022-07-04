@@ -20,11 +20,17 @@ public record struct Error
     /// </summary>
     public ErrorType Type { get; }
 
+    /// <summary>
+    /// Gets the numeric value of the type.
+    /// </summary>
+    public int NumericType { get; }
+
     private Error(string code, string description, ErrorType type)
     {
         Code = code;
         Description = description;
         Type = type;
+        NumericType = (int)type;
     }
 
     /// <summary>
@@ -76,4 +82,17 @@ public record struct Error
         string code = "General.NotFound",
         string description = "A 'Not Found' error has occurred.") =>
         new(code, description, ErrorType.NotFound);
+
+    /// <summary>
+    /// Creates an <see cref="Error"/> with the given numeric <paramref name="type"/>,
+    /// <paramref name="code"/>, and <paramref name="description"/>.
+    /// </summary>
+    /// <param name="type">An integer value which represents the type of error that occurred.</param>
+    /// <param name="code">The unique error code.</param>
+    /// <param name="description">The error description.</param>
+    public static Error Custom(
+        int type,
+        string code,
+        string description) =>
+        new(code, description, (ErrorType)type);
 }

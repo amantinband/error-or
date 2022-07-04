@@ -42,6 +42,8 @@
     - [`Switch`](#switch)
     - [`SwitchFirst`](#switchfirst)
   - [Error Types](#error-types)
+    - [Built-in Error Types](#built-in-error-types)
+    - [Custom error types](#custom-error-types)
     - [Why would I want to categorize my errors?](#why-would-i-want-to-categorize-my-errors)
   - [Built in result types](#built-in-result-types)
 - [How Is This Different From `OneOf<T0, T1>` or `FluentResults`?](#how-is-this-different-from-oneoft0-t1-or-fluentresults)
@@ -388,6 +390,8 @@ errorOrString.SwitchFirst(
 
 ## Error Types
 
+### Built-in Error Types
+
 Each error has a type out of the following options:
 
 ```csharp
@@ -409,6 +413,34 @@ public static Error Error.Unexpected(string code, string description);
 public static Error Error.Validation(string code, string description);
 public static Error Error.Conflict(string code, string description);
 public static Error Error.NotFound(string code, string description);
+```
+
+### Custom error types
+
+You can create your own result types if you would like to categorize your errors differently.
+
+A custom error type can be created with the `Custom` status method
+
+```csharp
+public static class MyErrorTypes
+{
+    const int ShouldNeverHappen = 12;
+}
+
+var error = Error.Custom(
+    type: MyErrorTypes.ShouldNeverHappen,
+    code: "User.ShouldNeverHappen",
+    description: "A user error that should never happen");
+```
+
+You can use the `Error.NumericType` method to retrieve the numeric type of the error.
+
+```csharp
+var errorMessage = Error.NumericType switch
+{
+    MyErrorType.ShouldNeverHappen => "Consider replacing dev team",
+    _ => "An unknown error occurred.",
+};
 ```
 
 The `ErrorType` enum is a good way to categorize errors.

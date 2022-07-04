@@ -58,10 +58,21 @@ public class ErrorTests
         ValidateError(error, expectedErrorType: ErrorType.NotFound);
     }
 
+    [Fact]
+    public void CreateError_WhenCustomType_ShouldHaveCustomErrorType()
+    {
+        // Act
+        Error error = Error.Custom(1232, ErrorCode, ErrorDescription);
+
+        // Assert
+        ValidateError(error, expectedErrorType: (ErrorType)1232);
+    }
+
     private static void ValidateError(Error error, ErrorType expectedErrorType)
     {
         error.Code.Should().Be(ErrorCode);
         error.Description.Should().Be(ErrorDescription);
         error.Type.Should().Be(expectedErrorType);
+        error.NumericType.Should().Be((int)expectedErrorType);
     }
 }

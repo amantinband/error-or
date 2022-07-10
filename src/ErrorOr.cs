@@ -1,4 +1,4 @@
-﻿namespace ErrorOr;
+namespace ErrorOr;
 
 /// <summary>
 /// A discriminated union of errors or a value.
@@ -20,12 +20,7 @@ public record struct ErrorOr<TValue>
     {
         get
         {
-            if (!IsError)
-            {
-                throw new InvalidOperationException("Errors can be retrieved only when the result is an error.");
-            }
-
-            return _errors!;
+            return _errors ?? new List<Error>(); // an empty list coherent with a no error condition
         }
     }
 
@@ -36,28 +31,18 @@ public record struct ErrorOr<TValue>
     {
         get
         {
-            if (IsError)
-            {
-                throw new InvalidOperationException("Value can be retrieved only when the result is not an error.");
-            }
-
-            return _value!;
+            return _value ?? throw new InvalidOperationException("Value can be retrieved only when the result is not an error.");
         }
     }
 
     /// <summary>
     /// Gets the first error.
     /// </summary>
-    public Error FirstError
+    public Error? FirstError
     {
         get
         {
-            if (!IsError)
-            {
-                throw new InvalidOperationException();
-            }
-
-            return _errors![0];
+            return _errors?.ElementAtOrDefault(0); // simply falls back to null
         }
     }
 
@@ -124,9 +109,9 @@ public record struct ErrorOr<TValue>
 
     public void SwitchFirst(Action<TValue> onValue, Action<Error> onFirstError)
     {
-        if (IsError)
+        if (IsError && FirstError.HasValue)
         {
-            onFirstError(FirstError);
+            onFirstError(FirstError.Value);
             return;
         }
 
@@ -145,9 +130,9 @@ public record struct ErrorOr<TValue>
 
     public TResult MatchFirst<TResult>(Func<TValue, TResult> onValue, Func<Error, TResult> onFirstError)
     {
-        if (IsError)
+        if (IsError && FirstError.HasValue)
         {
-            return onFirstError(FirstError);
+            return onFirstError(FirstError.Value);
         }
 
         return onValue(Value);

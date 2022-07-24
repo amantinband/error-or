@@ -7,7 +7,7 @@ namespace ErrorOr;
 /// </summary>
 public readonly record struct ErrorOr<TValue>
 {
-    private readonly List<Error> _errors;
+    private readonly Error[] _errors;
 
     /// <summary>
     /// Gets a value indicating whether the state is error.
@@ -27,7 +27,7 @@ public readonly record struct ErrorOr<TValue>
                 throw new InvalidOperationException("Errors can be retrieved only when the result is an error.");
             }
 
-            return _errors!;
+            return _errors;
         }
     }
 
@@ -55,13 +55,13 @@ public readonly record struct ErrorOr<TValue>
     internal ErrorOr(TValue value)
     {
         Value = value;
-        _errors = new List<Error>();
+        _errors = Array.Empty<Error>();
         IsError = false;
     }
 
-    private ErrorOr(List<Error> errors)
+    private ErrorOr(Error[] errors)
     {
-        if (errors.Count == 0)
+        if (errors.Length == 0)
         {
             throw new ArgumentOutOfRangeException(nameof(errors), "Provided list of errors must not be empty");
         }
@@ -73,22 +73,27 @@ public readonly record struct ErrorOr<TValue>
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}" /> from an errors.
     /// </summary>
-    public static ErrorOr<TValue> Fail(Error error) => new(new List<Error> { error });
+    public static ErrorOr<TValue> Fail(Error error) => new(new[] { error });
 
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}" /> from multiple errors.
     /// </summary>
     public static ErrorOr<TValue> Fail(Error error, params Error[] errors)
     {
-        var errorList = new List<Error> { error };
-        errorList.AddRange(errors);
-        return new ErrorOr<TValue>(errorList);
+        var errorArray = new Error[errors.Length + 1];
+        errorArray[0] = error;
+        for (var i = 0; i < errors.Length; i++)
+        {
+            errorArray[i + 1] = errors[i];
+        }
+
+        return new ErrorOr<TValue>(errorArray);
     }
 
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}" /> from an enumerable of errors.
     /// </summary>
-    public static ErrorOr<TValue> Fail(IEnumerable<Error> errors) => new(errors.ToList());
+    public static ErrorOr<TValue> Fail(IEnumerable<Error> errors) => new(errors.ToArray());
 
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a value.
@@ -108,7 +113,7 @@ public readonly record struct ErrorOr<TValue>
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
     /// </summary>
-    public static implicit operator ErrorOr<TValue>(Error[] errors) => Fail(errors.ToList());
+    public static implicit operator ErrorOr<TValue>(Error[] errors) => Fail(errors);
 
     public void Switch(Action<TValue> onValue, Action<IReadOnlyList<Error>> onError)
     {

@@ -185,12 +185,35 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void StaticCreation_ShouldBePossible()
+    public void StaticResultCreation_ShouldBePossible()
     {
         // Act
         ErrorOr<Success> errorOrSuccess = ErrorOr.Ok(Result.Success);
 
         // Assert
         errorOrSuccess.IsError.Should().BeFalse();
+    }
+
+    [Fact]
+    public void StaticErrorCreation_ShouldBePossible()
+    {
+        // Arrange
+        var error = Error.Validation("User.Name", "Name is too short");
+        var errorArray = new[] { error, error };
+        var errorList = new List<Error> { error, error };
+
+        // Act
+        ErrorOr<bool> oneError = ErrorOr<bool>.Fail(error);
+        ErrorOr<bool> twoErrorsWithParams = ErrorOr<bool>.Fail(error, error);
+        ErrorOr<bool> threeErrorsWithParams = ErrorOr<bool>.Fail(error, error, error);
+        ErrorOr<bool> twoErrorsWithArray = ErrorOr<bool>.Fail(errorArray);
+        ErrorOr<bool> twoErrorsWithList = ErrorOr<bool>.Fail(errorList);
+
+        // Assert
+        oneError.Errors.Should().HaveCount(1);
+        twoErrorsWithParams.Errors.Should().HaveCount(2);
+        threeErrorsWithParams.Errors.Should().HaveCount(3);
+        twoErrorsWithArray.Errors.Should().HaveCount(2);
+        twoErrorsWithList.Errors.Should().HaveCount(2);
     }
 }

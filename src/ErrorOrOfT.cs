@@ -80,6 +80,26 @@ public record struct ErrorOr<TValue>
     }
 
     /// <summary>
+    /// Creates an <see cref="ErrorOr{TValue}" /> from an errors.
+    /// </summary>
+    public static ErrorOr<TValue> Fail(Error error) => new(new List<Error> { error });
+
+    /// <summary>
+    /// Creates an <see cref="ErrorOr{TValue}" /> from multiple errors.
+    /// </summary>
+    public static ErrorOr<TValue> Fail(Error error, params Error[] errors)
+    {
+        var errorList = new List<Error> { error };
+        errorList.AddRange(errors);
+        return new ErrorOr<TValue>(errorList);
+    }
+
+    /// <summary>
+    /// Creates an <see cref="ErrorOr{TValue}" /> from an enumerable of errors.
+    /// </summary>
+    public static ErrorOr<TValue> Fail(IEnumerable<Error> errors) => new(errors.ToList());
+
+    /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a value.
     /// </summary>
     public static implicit operator ErrorOr<TValue>(TValue value) => ErrorOr.Ok(value);
@@ -87,26 +107,17 @@ public record struct ErrorOr<TValue>
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from an error.
     /// </summary>
-    public static implicit operator ErrorOr<TValue>(Error error)
-    {
-        return new ErrorOr<TValue>(error);
-    }
+    public static implicit operator ErrorOr<TValue>(Error error) => Fail(error);
 
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
     /// </summary>
-    public static implicit operator ErrorOr<TValue>(List<Error> errors)
-    {
-        return new ErrorOr<TValue>(errors);
-    }
+    public static implicit operator ErrorOr<TValue>(List<Error> errors) => Fail(errors);
 
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
     /// </summary>
-    public static implicit operator ErrorOr<TValue>(Error[] errors)
-    {
-        return new ErrorOr<TValue>(errors.ToList());
-    }
+    public static implicit operator ErrorOr<TValue>(Error[] errors) => Fail(errors.ToList());
 
     public void Switch(Action<TValue> onValue, Action<List<Error>> onError)
     {

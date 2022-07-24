@@ -22,19 +22,6 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void ImplicitCastResult_WhenAccessingError_ShouldThrow()
-    {
-        // Act
-        ErrorOr<Person> errorOrPerson = new Person("Amichai");
-        var accessErrorsAction = () => errorOrPerson.Errors;
-        var accessFirstErrorAction = () => errorOrPerson.FirstError;
-
-        // Assert
-        accessErrorsAction.Should().ThrowExactly<InvalidOperationException>();
-        accessFirstErrorAction.Should().ThrowExactly<InvalidOperationException>();
-    }
-
-    [Fact]
     public void ImplicitCastPrimitiveResult_WhenAccessingResult_ShouldReturnValue()
     {
         // Arrange

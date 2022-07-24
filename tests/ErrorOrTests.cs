@@ -183,4 +183,14 @@ public class ErrorOrTests
         errorOrPerson.IsError.Should().BeTrue();
         errorOrPerson.FirstError.Should().Be(errors[0]);
     }
+
+    [Fact]
+    public void StaticCreation_ShouldBePossible()
+    {
+        // Act
+        ErrorOr<Success> errorOrSuccess = ErrorOr.Ok(Result.Success);
+
+        // Assert
+        errorOrSuccess.IsError.Should().BeFalse();
+    }
 }

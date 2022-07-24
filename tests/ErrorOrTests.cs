@@ -235,4 +235,30 @@ public class ErrorOrTests
         twoErrorsWithArray.Errors.Should().HaveCount(2);
         twoErrorsWithList.Errors.Should().HaveCount(2);
     }
+
+    [Fact]
+    public void ErrorIsError_ShouldCompileWhenGettingValue()
+    {
+        // Arrange
+        ErrorOr<Person> errorOrWithError = Error.Validation("User.Name", "Name is too short");
+
+        // Act
+        if (!errorOrWithError.IsError)
+        {
+            Person result = errorOrWithError.Value;
+        }
+    }
+
+    [Fact]
+    public void ErrorIsSuccess_ShouldCompileWhenGettingValue()
+    {
+        // Arrange
+        ErrorOr<Person> errorOrWithError = new Person("ThisCouldBeYourName");
+
+        // Act
+        if (errorOrWithError.IsSuccess)
+        {
+            Person result = errorOrWithError.Value;
+        }
+    }
 }

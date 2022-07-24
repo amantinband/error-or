@@ -15,6 +15,10 @@ public readonly record struct ErrorOr<TValue>
     [MemberNotNullWhen(false, nameof(Value))]
     public bool IsError { get; }
 
+    /// <summary>Gets a value indicating whether the state is error.</summary>
+    [MemberNotNullWhen(true, nameof(Value))]
+    public bool IsSuccess => !IsError;
+
     /// <summary>
     /// Gets the list of errors.
     /// </summary>

@@ -81,7 +81,7 @@ public class MatchTests
         string OnValueAction(Person _) => throw new Exception("Should not be called");
         string OnFirstErrorAction(Error errors)
         {
-            errors.Should().BeEquivalentTo(errorOrPerson.Errors[0])
+            errors.Should().BeEquivalentTo(errorOrPerson.Errors![0])
                 .And.BeEquivalentTo(errorOrPerson.FirstError);
 
             return "Nice";

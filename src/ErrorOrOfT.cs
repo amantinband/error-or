@@ -13,27 +13,20 @@ public readonly record struct ErrorOr<TValue>
     /// Gets a value indicating whether the state is error.
     /// </summary>
     [MemberNotNullWhen(false, nameof(Value))]
+    [MemberNotNullWhen(true, nameof(Errors))]
+    [MemberNotNullWhen(true, nameof(FirstError))]
     public bool IsError { get; }
 
     /// <summary>Gets a value indicating whether the state is error.</summary>
     [MemberNotNullWhen(true, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(Errors))]
+    [MemberNotNullWhen(false, nameof(FirstError))]
     public bool IsSuccess => !IsError;
 
     /// <summary>
     /// Gets the list of errors.
     /// </summary>
-    public IReadOnlyList<Error> Errors
-    {
-        get
-        {
-            if (!IsError)
-            {
-                throw new InvalidOperationException("Errors can be retrieved only when the result is an error.");
-            }
-
-            return _errors;
-        }
-    }
+    public IReadOnlyList<Error>? Errors => _errors;
 
     /// <summary>
     /// Gets the value.
@@ -43,18 +36,7 @@ public readonly record struct ErrorOr<TValue>
     /// <summary>
     /// Gets the first error.
     /// </summary>
-    public Error FirstError
-    {
-        get
-        {
-            if (!IsError)
-            {
-                throw new InvalidOperationException();
-            }
-
-            return _errors[0];
-        }
-    }
+    public Error? FirstError => Errors?[0];
 
     internal ErrorOr(TValue value)
     {

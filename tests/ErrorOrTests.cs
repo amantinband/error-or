@@ -263,28 +263,38 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void ErrorIsError_ShouldCompileWhenGettingValue()
+    public void ErrorIsError_ShouldCompileWhenGettingValueOrErrors()
     {
         // Arrange
         ErrorOr<Person> errorOrWithError = Error.Validation("User.Name", "Name is too short");
 
         // Act
-        if (!errorOrWithError.IsError)
+        if (errorOrWithError.IsError)
+        {
+            IReadOnlyList<Error> errors = errorOrWithError.Errors;
+            Error error = errorOrWithError.FirstError;
+        }
+        else
         {
             Person result = errorOrWithError.Value;
         }
     }
 
     [Fact]
-    public void ErrorIsSuccess_ShouldCompileWhenGettingValue()
+    public void ErrorIsSuccess_ShouldCompileWhenGettingValueOrErrors()
     {
         // Arrange
-        ErrorOr<Person> errorOrWithError = new Person("ThisCouldBeYourName");
+        ErrorOr<Person> errorOrWithResult = new Person("ThisCouldBeYourName");
 
         // Act
-        if (errorOrWithError.IsSuccess)
+        if (errorOrWithResult.IsSuccess)
         {
-            Person result = errorOrWithError.Value;
+            Person result = errorOrWithResult.Value;
+        }
+        else
+        {
+            IReadOnlyList<Error> errors = errorOrWithResult.Errors;
+            Error error = errorOrWithResult.FirstError;
         }
     }
 }

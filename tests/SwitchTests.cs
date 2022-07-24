@@ -65,7 +65,7 @@ public class SwitchTests
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
         void OnValueAction(Person _) => throw new Exception("Should not be called");
         void OnFirstErrorAction(Error errors)
-            => errors.Should().BeEquivalentTo(errorOrPerson.Errors[0])
+            => errors.Should().BeEquivalentTo(errorOrPerson.Errors![0])
                 .And.BeEquivalentTo(errorOrPerson.FirstError);
 
         // Act

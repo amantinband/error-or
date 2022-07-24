@@ -1,16 +1,18 @@
-﻿namespace ErrorOr;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace ErrorOr;
 
 /// <summary>
 /// A discriminated union of errors or a value.
 /// </summary>
 public record struct ErrorOr<TValue>
 {
-    private readonly TValue? _value = default;
     private readonly List<Error>? _errors = null;
 
     /// <summary>
     /// Gets a value indicating whether the state is error.
     /// </summary>
+    [MemberNotNullWhen(false, nameof(Value))]
     public bool IsError { get; }
 
     /// <summary>
@@ -32,18 +34,7 @@ public record struct ErrorOr<TValue>
     /// <summary>
     /// Gets the value.
     /// </summary>
-    public TValue Value
-    {
-        get
-        {
-            if (IsError)
-            {
-                throw new InvalidOperationException("Value can be retrieved only when the result is not an error.");
-            }
-
-            return _value!;
-        }
-    }
+    public TValue? Value { get; } = default;
 
     /// <summary>
     /// Gets the first error.
@@ -75,7 +66,7 @@ public record struct ErrorOr<TValue>
 
     internal ErrorOr(TValue value)
     {
-        _value = value;
+        Value = value;
         IsError = false;
     }
 

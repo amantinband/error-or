@@ -45,6 +45,7 @@ public class ErrorOrTests
 
         // Assert
         errorOrInt.IsError.Should().BeFalse();
+        errorOrInt.IsSuccess.Should().BeTrue();
         errorOrInt.Value.Should().Be(result);
     }
 
@@ -59,15 +60,19 @@ public class ErrorOrTests
 
         // Assert
         errorOrSuccess.IsError.Should().BeFalse();
+        errorOrSuccess.IsSuccess.Should().BeTrue();
         errorOrSuccess.Value.Should().Be(Result.Success);
 
         errorOrCreated.IsError.Should().BeFalse();
+        errorOrCreated.IsSuccess.Should().BeTrue();
         errorOrCreated.Value.Should().Be(Result.Created);
 
         errorOrDeleted.IsError.Should().BeFalse();
+        errorOrDeleted.IsSuccess.Should().BeTrue();
         errorOrDeleted.Value.Should().Be(Result.Deleted);
 
         errorOrUpdated.IsError.Should().BeFalse();
+        errorOrUpdated.IsSuccess.Should().BeTrue();
         errorOrUpdated.Value.Should().Be(Result.Updated);
     }
 
@@ -82,6 +87,7 @@ public class ErrorOrTests
 
         // Assert
         errorOrPerson.IsError.Should().BeTrue();
+        errorOrPerson.IsSuccess.Should().BeFalse();
         errorOrPerson.Errors.Should().ContainSingle().Which.Should().Be(error);
     }
 
@@ -96,6 +102,7 @@ public class ErrorOrTests
 
         // Assert
         errorOrPerson.IsError.Should().BeTrue();
+        errorOrPerson.IsSuccess.Should().BeFalse();
         errorOrPerson.FirstError.Should().Be(error);
     }
 
@@ -114,6 +121,7 @@ public class ErrorOrTests
 
         // Assert
         errorOrPerson.IsError.Should().BeTrue();
+        errorOrPerson.IsSuccess.Should().BeFalse();
         errorOrPerson.Errors.Should().HaveCount(errors.Count).And.BeEquivalentTo(errors);
     }
 
@@ -132,6 +140,7 @@ public class ErrorOrTests
 
         // Assert
         errorOrPerson.IsError.Should().BeTrue();
+        errorOrPerson.IsSuccess.Should().BeFalse();
         errorOrPerson.Errors.Should().HaveCount(errors.Length).And.BeEquivalentTo(errors);
     }
 
@@ -150,6 +159,7 @@ public class ErrorOrTests
 
         // Assert
         errorOrPerson.IsError.Should().BeTrue();
+        errorOrPerson.IsSuccess.Should().BeFalse();
         errorOrPerson.FirstError.Should().Be(errors[0]);
     }
 
@@ -168,6 +178,7 @@ public class ErrorOrTests
 
         // Assert
         errorOrPerson.IsError.Should().BeTrue();
+        errorOrPerson.IsSuccess.Should().BeFalse();
         errorOrPerson.FirstError.Should().Be(errors[0]);
     }
 
@@ -211,6 +222,7 @@ public class ErrorOrTests
 
         // Assert
         errorOrSuccess.IsError.Should().BeFalse();
+        errorOrSuccess.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
@@ -229,10 +241,24 @@ public class ErrorOrTests
         ErrorOr<bool> twoErrorsWithList = ErrorOr<bool>.Fail(errorList);
 
         // Assert
+        oneError.IsError.Should().BeTrue();
+        oneError.IsSuccess.Should().BeFalse();
         oneError.Errors.Should().HaveCount(1);
+
+        twoErrorsWithParams.IsError.Should().BeTrue();
+        twoErrorsWithParams.IsSuccess.Should().BeFalse();
         twoErrorsWithParams.Errors.Should().HaveCount(2);
+
+        threeErrorsWithParams.IsError.Should().BeTrue();
+        threeErrorsWithParams.IsSuccess.Should().BeFalse();
         threeErrorsWithParams.Errors.Should().HaveCount(3);
+
+        twoErrorsWithArray.IsError.Should().BeTrue();
+        twoErrorsWithArray.IsSuccess.Should().BeFalse();
         twoErrorsWithArray.Errors.Should().HaveCount(2);
+
+        twoErrorsWithList.IsError.Should().BeTrue();
+        twoErrorsWithList.IsSuccess.Should().BeFalse();
         twoErrorsWithList.Errors.Should().HaveCount(2);
     }
 

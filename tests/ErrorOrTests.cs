@@ -86,19 +86,6 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void ImplicitCastError_WhenAccessingValue_ShouldThrow()
-    {
-        // Arrange
-        ErrorOr<Person> errorOrPerson = Error.Validation("User.Name", "Name is too short");
-
-        // Act
-        var action = () => errorOrPerson.Value;
-
-        // Assert
-        action.Should().ThrowExactly<InvalidOperationException>();
-    }
-
-    [Fact]
     public void ImplicitCastSingleError_WhenAccessingFirstError_ShouldReturnError()
     {
         // Arrange

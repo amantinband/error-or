@@ -5,9 +5,9 @@ namespace ErrorOr;
 /// <summary>
 /// A discriminated union of errors or a value.
 /// </summary>
-public record struct ErrorOr<TValue>
+public readonly record struct ErrorOr<TValue>
 {
-    private readonly List<Error>? _errors = null;
+    private readonly List<Error> _errors;
 
     /// <summary>
     /// Gets a value indicating whether the state is error.
@@ -18,7 +18,7 @@ public record struct ErrorOr<TValue>
     /// <summary>
     /// Gets the list of errors.
     /// </summary>
-    public List<Error> Errors
+    public IReadOnlyList<Error> Errors
     {
         get
         {
@@ -48,26 +48,21 @@ public record struct ErrorOr<TValue>
                 throw new InvalidOperationException();
             }
 
-            return _errors![0];
+            return _errors[0];
         }
     }
 
-    private ErrorOr(Error error)
+    internal ErrorOr(TValue value)
     {
-        _errors = new List<Error> { error };
-        IsError = true;
+        Value = value;
+        _errors = new List<Error>();
+        IsError = false;
     }
 
     private ErrorOr(List<Error> errors)
     {
         _errors = errors;
         IsError = true;
-    }
-
-    internal ErrorOr(TValue value)
-    {
-        Value = value;
-        IsError = false;
     }
 
     /// <summary>
@@ -110,7 +105,7 @@ public record struct ErrorOr<TValue>
     /// </summary>
     public static implicit operator ErrorOr<TValue>(Error[] errors) => Fail(errors.ToList());
 
-    public void Switch(Action<TValue> onValue, Action<List<Error>> onError)
+    public void Switch(Action<TValue> onValue, Action<IReadOnlyList<Error>> onError)
     {
         if (IsError)
         {
@@ -132,7 +127,7 @@ public record struct ErrorOr<TValue>
         onValue(Value);
     }
 
-    public TResult Match<TResult>(Func<TValue, TResult> onValue, Func<List<Error>, TResult> onError)
+    public TResult Match<TResult>(Func<TValue, TResult> onValue, Func<IReadOnlyList<Error>, TResult> onError)
     {
         if (IsError)
         {

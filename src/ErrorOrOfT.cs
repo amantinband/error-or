@@ -61,6 +61,11 @@ public readonly record struct ErrorOr<TValue>
 
     private ErrorOr(List<Error> errors)
     {
+        if (errors.Count == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(errors), "Provided list of errors must not be empty");
+        }
+
         _errors = errors;
         IsError = true;
     }

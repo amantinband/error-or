@@ -172,6 +172,38 @@ public class ErrorOrTests
     }
 
     [Fact]
+    public void ImplicitCastErrorList_WhenProvidingEmptyListShouldThrow()
+    {
+        // Arrange
+        var errors = new List<Error>();
+
+        // Act
+        var errorOrCreation = () =>
+        {
+            ErrorOr<Person> errorOrPerson = errors;
+        };
+
+        // Assert
+        errorOrCreation.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void StaticCreationErrorList_WhenProvidingEmptyListShouldThrow()
+    {
+        // Arrange
+        var errors = new List<Error>();
+
+        // Act
+        var errorOrCreation = () =>
+        {
+            ErrorOr<Person> errorOrPerson = ErrorOr<Person>.Fail(errors);
+        };
+
+        // Assert
+        errorOrCreation.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
     public void StaticResultCreation_ShouldBePossible()
     {
         // Act

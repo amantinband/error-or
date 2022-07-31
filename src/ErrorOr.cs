@@ -3,7 +3,7 @@
 /// <summary>
 /// A discriminated union of errors or a value.
 /// </summary>
-public record struct ErrorOr<TValue>
+public record struct ErrorOr<TValue> : IErrorOr
 {
     private readonly TValue? _value = default;
     private readonly List<Error>? _errors = null;
@@ -27,6 +27,14 @@ public record struct ErrorOr<TValue>
 
             return _errors!;
         }
+    }
+
+    /// <summary>
+    /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
+    /// </summary>
+    public static ErrorOr<TValue> From(List<Error> errors)
+    {
+        return errors;
     }
 
     /// <summary>

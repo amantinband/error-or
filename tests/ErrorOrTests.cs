@@ -8,6 +8,34 @@ public class ErrorOrTests
     private record Person(string Name);
 
     [Fact]
+    public void CreateFromErrorList_WhenAccessingErrors_ShouldReturnErrorList()
+    {
+        // Arrange
+        var errors = new List<Error> { Error.Validation("User.Name", "Name is too short") };
+
+        // Act
+        var errorOrPerson = ErrorOr<Person>.From(errors);
+
+        // Assert
+        errorOrPerson.IsError.Should().BeTrue();
+        errorOrPerson.Errors.Should().ContainSingle().Which.Should().Be(errors.Single());
+    }
+
+    [Fact]
+    public void CreateFromErrorList_WhenAccessingValue_ShouldThrow()
+    {
+        // Arrange
+        var errors = new List<Error> { Error.Validation("User.Name", "Name is too short") };
+        var errorOrPerson = ErrorOr<Person>.From(errors);
+
+        // Act
+        var action = () => errorOrPerson.Value;
+
+        // Assert
+        action.Should().ThrowExactly<InvalidOperationException>();
+    }
+
+    [Fact]
     public void ImplicitCastResult_WhenAccessingResult_ShouldReturnValue()
     {
         // Arrange

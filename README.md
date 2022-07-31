@@ -249,8 +249,9 @@ return createUserResult.MatchFirst(
 You have validation logic such as `MediatR` behaviors, you can drop the exceptions throwing logic and simply return a list of errors from the pipeline behavior
 
 ```csharp
-public class ValidationBehavior<TRequest, TResult> : IPipelineBehavior<TRequest, ErrorOr<TResult>>
-    where TRequest : IRequest<ErrorOr<TResult>>
+public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IRequest<TResponse>
+    where TResponse : IErrorOr
 {
     private readonly IValidator<TRequest>? _validator;
 
@@ -259,27 +260,42 @@ public class ValidationBehavior<TRequest, TResult> : IPipelineBehavior<TRequest,
         _validator = validator;
     }
 
-    public async Task<ErrorOr<TResult>> Handle(
+    public async Task<TResponse> Handle(
         TRequest request,
         CancellationToken cancellationToken,
-        RequestHandlerDelegate<ErrorOr<TResult>> next)
+        RequestHandlerDelegate<TResponse> next)
     {
         if (_validator == null)
         {
             return await next();
         }
 
-        var validationResult = _validator.Validate(request);
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
 
-        if (validationResult.IsError)
+        if (validationResult.IsValid)
         {
-            return validationResult.Errors
-               .ConvertAll(validationFailure => Error.Validation(
-                   code: validationFailure.PropertyName,
-                   description: validationFailure.ErrorMessage));
+            return await next();
         }
 
-        return await next();
+        return TryCreateResponseFromErrors(validationResult.Errors, out var response)
+            ? response
+            : throw new ValidationException(validationResult.Errors);
+    }
+
+    private static bool TryCreateResponseFromErrors(List<ValidationFailure> validationFailures, out TResponse response)
+    {
+        List<Error> errors = validationFailures.ConvertAll(x => Error.Validation(
+                code: x.PropertyName,
+                description: x.ErrorMessage));
+
+        response = (TResponse?)typeof(TResponse)
+            .GetMethod(
+                name: nameof(ErrorOr<object>.From),
+                bindingAttr: BindingFlags.Static | BindingFlags.Public,
+                types: new[] { typeof(List<Error>) })?
+            .Invoke(null, new[] { errors })!;
+
+        return response is not null;
     }
 }
 ```

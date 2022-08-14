@@ -8,6 +8,14 @@ public record struct ErrorOr<TValue> : IErrorOr
     private readonly TValue? _value = default;
     private readonly List<Error>? _errors = null;
 
+    private static readonly Error NoFirstError = Error.Unexpected(
+        code: "ErrorOr.NoFirstError",
+        description: "First error cannot be retrieved from a successful ErrorOr.");
+
+    private static readonly Error NoErrors = Error.Unexpected(
+        code: "ErrorOr.NoErrors",
+        description: "Error list cannot be retrieved from a successful ErrorOr.");
+
     /// <summary>
     /// Gets a value indicating whether the state is error.
     /// </summary>
@@ -16,18 +24,7 @@ public record struct ErrorOr<TValue> : IErrorOr
     /// <summary>
     /// Gets the list of errors.
     /// </summary>
-    public List<Error> Errors
-    {
-        get
-        {
-            if (!IsError)
-            {
-                throw new InvalidOperationException("Errors can be retrieved only when the result is an error.");
-            }
-
-            return _errors!;
-        }
-    }
+    public List<Error> Errors => IsError ? _errors! : new List<Error> { NoErrors };
 
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
@@ -40,18 +37,7 @@ public record struct ErrorOr<TValue> : IErrorOr
     /// <summary>
     /// Gets the value.
     /// </summary>
-    public TValue Value
-    {
-        get
-        {
-            if (IsError)
-            {
-                throw new InvalidOperationException("Value can be retrieved only when the result is not an error.");
-            }
-
-            return _value!;
-        }
-    }
+    public TValue Value => _value!;
 
     /// <summary>
     /// Gets the first error.
@@ -62,7 +48,7 @@ public record struct ErrorOr<TValue> : IErrorOr
         {
             if (!IsError)
             {
-                throw new InvalidOperationException();
+                return NoFirstError;
             }
 
             return _errors![0];
@@ -159,5 +145,13 @@ public record struct ErrorOr<TValue> : IErrorOr
         }
 
         return onValue(Value);
+    }
+}
+
+public static class ErrorOr
+{
+    public static ErrorOr<TValue> From<TValue>(TValue value)
+    {
+        return value;
     }
 }

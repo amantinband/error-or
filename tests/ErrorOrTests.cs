@@ -8,6 +8,48 @@ public class ErrorOrTests
     private record Person(string Name);
 
     [Fact]
+    public void CreateFromValue_WhenAccessingValue_ShouldReturnValue()
+    {
+        // Arrange
+        IEnumerable<string> value = new[] { "value" };
+
+        // Act
+        var errorOrPerson = ErrorOr.From(value);
+
+        // Assert
+        errorOrPerson.IsError.Should().BeFalse();
+        errorOrPerson.Value.Should().BeSameAs(value);
+    }
+
+    [Fact]
+    public void CreateFromValue_WhenAccessingErrors_ShouldReturnUnexpectedError()
+    {
+        // Arrange
+        IEnumerable<string> value = new[] { "value" };
+        var errorOrPerson = ErrorOr.From(value);
+
+        // Act
+        var errors = errorOrPerson.Errors;
+
+        // Assert
+        errors.Should().ContainSingle().Which.Type.Should().Be(ErrorType.Unexpected);
+    }
+
+    [Fact]
+    public void CreateFromValue_WhenAccessingFirstError_ShouldReturnUnexpectedError()
+    {
+        // Arrange
+        IEnumerable<string> value = new[] { "value" };
+        var errorOrPerson = ErrorOr.From(value);
+
+        // Act
+        var firstError = errorOrPerson.FirstError;
+
+        // Assert
+        firstError.Type.Should().Be(ErrorType.Unexpected);
+    }
+
+    [Fact]
     public void CreateFromErrorList_WhenAccessingErrors_ShouldReturnErrorList()
     {
         // Arrange
@@ -22,17 +64,17 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void CreateFromErrorList_WhenAccessingValue_ShouldThrow()
+    public void CreateFromErrorList_WhenAccessingValue_ShouldReturnDefault()
     {
         // Arrange
         var errors = new List<Error> { Error.Validation("User.Name", "Name is too short") };
         var errorOrPerson = ErrorOr<Person>.From(errors);
 
         // Act
-        var action = () => errorOrPerson.Value;
+        var value = errorOrPerson.Value;
 
         // Assert
-        action.Should().ThrowExactly<InvalidOperationException>();
+        value.Should().Be(default);
     }
 
     [Fact]
@@ -50,16 +92,27 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void ImplicitCastResult_WhenAccessingError_ShouldThrow()
+    public void ImplicitCastResult_WhenAccessingErrors_ShouldReturnUnexpectedError()
     {
-        // Act
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
-        var accessErrorsAction = () => errorOrPerson.Errors;
-        var accessFirstErrorAction = () => errorOrPerson.FirstError;
+
+        // Act
+        var errors = errorOrPerson.Errors;
 
         // Assert
-        accessErrorsAction.Should().ThrowExactly<InvalidOperationException>();
-        accessFirstErrorAction.Should().ThrowExactly<InvalidOperationException>();
+        errors.Should().ContainSingle().Which.Type.Should().Be(ErrorType.Unexpected);
+    }
+
+    [Fact]
+    public void ImplicitCastResult_WhenAccessingFirstError_ShouldReturnUnexpectedError()
+    {
+        ErrorOr<Person> errorOrPerson = new Person("Amichai");
+
+        // Act
+        var firstError = errorOrPerson.FirstError;
+
+        // Assert
+        firstError.Type.Should().Be(ErrorType.Unexpected);
     }
 
     [Fact]
@@ -114,16 +167,16 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void ImplicitCastError_WhenAccessingValue_ShouldThrow()
+    public void ImplicitCastError_WhenAccessingValue_ShouldReturnDefault()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = Error.Validation("User.Name", "Name is too short");
 
         // Act
-        var action = () => errorOrPerson.Value;
+        var value = errorOrPerson.Value;
 
         // Assert
-        action.Should().ThrowExactly<InvalidOperationException>();
+        value.Should().Be(default);
     }
 
     [Fact]

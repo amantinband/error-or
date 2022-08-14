@@ -3,7 +3,7 @@ namespace ErrorOr;
 /// <summary>
 /// Represents an error.
 /// </summary>
-public record struct Error
+public readonly record struct Error
 {
     /// <summary>
     /// Gets the unique error code.

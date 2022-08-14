@@ -28,9 +28,11 @@
 - [Dropping the exceptions throwing logic](#dropping-the-exceptions-throwing-logic)
 - [Usage](#usage)
   - [Creating an `ErrorOr<result>`](#creating-an-errororresult)
-    - [From Value](#from-value)
+    - [From Value, using implicit conversion](#from-value-using-implicit-conversion)
+    - [From Value, using `From`](#from-value-using-from)
     - [From Single Error](#from-single-error)
-    - [From List of Errors](#from-list-of-errors)
+    - [From List of Errors, using implicit conversion](#from-list-of-errors-using-implicit-conversion)
+    - [From List of Errors, using `From`](#from-list-of-errors-using-from)
   - [Checking if the `ErrorOr<result>` is an error](#checking-if-the-errororresult-is-an-error)
   - [Accessing the `ErrorOr<result>` result](#accessing-the-errororresult-result)
     - [Accessing the Value](#accessing-the-value)
@@ -306,7 +308,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
 There are implicit converters from `TResult`, `Error`, `List<Error>` to `ErrorOr<TResult>`
 
-### From Value
+### From Value, using implicit conversion
 
 ```csharp
 ErrorOr<int> result = 5;
@@ -316,6 +318,19 @@ ErrorOr<int> result = 5;
 public ErrorOr<int> GetValue()
 {
     return 5;
+}
+```
+
+### From Value, using `From`
+
+```csharp
+ErrorOr<int> result = ErrorOr.From(5);
+```
+
+```csharp
+public ErrorOr<int> GetValue()
+{
+    return ErrorOr.From(5);
 }
 ```
 
@@ -332,7 +347,7 @@ public ErrorOr<int> GetValue()
 }
 ```
 
-### From List of Errors
+### From List of Errors, using implicit conversion
 
 ```csharp
 ErrorOr<int> result = new List<Error> { Error.Unexpected(), Error.Validation() };
@@ -342,6 +357,23 @@ ErrorOr<int> result = new List<Error> { Error.Unexpected(), Error.Validation() }
 public ErrorOr<int> GetValue()
 {
     return new List<Error>
+    {
+        Error.Unexpected(),
+        Error.Validation()
+    };
+}
+```
+
+### From List of Errors, using `From`
+
+```csharp
+ErrorOr<int> result = ErrorOr<int>.From(new List<Error> { Error.Unexpected(), Error.Validation() });
+```
+
+```csharp
+public ErrorOr<int> GetValue()
+{
+    return ErrorOr<int>.From(List<Error>
     {
         Error.Unexpected(),
         Error.Validation()

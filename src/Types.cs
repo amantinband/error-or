@@ -1,9 +1,9 @@
 namespace ErrorOr;
 
-public record struct Success;
-public record struct Created;
-public record struct Deleted;
-public record struct Updated;
+public readonly record struct Success;
+public readonly record struct Created;
+public readonly record struct Deleted;
+public readonly record struct Updated;
 
 public static class Result
 {

@@ -20,8 +20,8 @@
 
   <ItemGroup>
     <None Include="../assets/icon-square.png" Pack="true" Visible="false" PackagePath="" />
-    <None Include="stylecop.json" />
-    <AdditionalFiles Include="stylecop.json" />
+    <None Include="Stylecop.json" />
+    <AdditionalFiles Include="Stylecop.json" />
   </ItemGroup>
 
 </Project>

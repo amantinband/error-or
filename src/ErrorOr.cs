@@ -24,7 +24,7 @@ public record struct ErrorOr<TValue> : IErrorOr
     /// <summary>
     /// Gets the list of errors.
     /// </summary>
-    public List<Error> Errors => IsError ? _errors! : new List<Error> { NoErrors };
+    public IReadOnlyList<Error> Errors => IsError ? _errors! : new List<Error> { NoErrors };
 
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
@@ -105,7 +105,7 @@ public record struct ErrorOr<TValue> : IErrorOr
         return new ErrorOr<TValue>(errors.ToList());
     }
 
-    public void Switch(Action<TValue> onValue, Action<List<Error>> onError)
+    public void Switch(Action<TValue> onValue, Action<IReadOnlyList<Error>> onError)
     {
         if (IsError)
         {
@@ -127,7 +127,7 @@ public record struct ErrorOr<TValue> : IErrorOr
         onValue(Value);
     }
 
-    public TResult Match<TResult>(Func<TValue, TResult> onValue, Func<List<Error>, TResult> onError)
+    public TResult Match<TResult>(Func<TValue, TResult> onValue, Func<IReadOnlyList<Error>, TResult> onError)
     {
         if (IsError)
         {

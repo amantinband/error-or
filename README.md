@@ -129,7 +129,7 @@ ErrorOr<Created> AddUser(User user)
         return Error.Failure(description: "Failed to add user");
     }
 
-    return Results.Created;
+    return Result.Created;
 }
 ```
 

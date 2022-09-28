@@ -1,4 +1,4 @@
-﻿namespace ErrorOr;
+namespace ErrorOr;
 
 /// <summary>
 /// A discriminated union of errors or a value.
@@ -116,6 +116,17 @@ public record struct ErrorOr<TValue> : IErrorOr
         onValue(Value);
     }
 
+    public async Task SwitchAsync(Func<TValue, Task> onValue, Func<List<Error>, Task> onError)
+    {
+        if (IsError)
+        {
+            await onError(Errors);
+            return;
+        }
+
+        await onValue(Value);
+    }
+
     public void SwitchFirst(Action<TValue> onValue, Action<Error> onFirstError)
     {
         if (IsError)
@@ -125,6 +136,17 @@ public record struct ErrorOr<TValue> : IErrorOr
         }
 
         onValue(Value);
+    }
+
+    public async Task SwitchFirstAsync(Func<TValue, Task> onValue, Func<Error, Task> onFirstError)
+    {
+        if (IsError)
+        {
+            await onFirstError(FirstError);
+            return;
+        }
+
+        await onValue(Value);
     }
 
     public TResult Match<TResult>(Func<TValue, TResult> onValue, Func<List<Error>, TResult> onError)
@@ -137,6 +159,16 @@ public record struct ErrorOr<TValue> : IErrorOr
         return onValue(Value);
     }
 
+    public async Task<TResult> MatchAsync<TResult>(Func<TValue, Task<TResult>> onValue, Func<List<Error>, Task<TResult>> onError)
+    {
+        if (IsError)
+        {
+            return await onError(Errors);
+        }
+
+        return await onValue(Value);
+    }
+
     public TResult MatchFirst<TResult>(Func<TValue, TResult> onValue, Func<Error, TResult> onFirstError)
     {
         if (IsError)
@@ -145,6 +177,16 @@ public record struct ErrorOr<TValue> : IErrorOr
         }
 
         return onValue(Value);
+    }
+
+    public async Task<TResult> MatchFirstAsync<TResult>(Func<TValue, Task<TResult>> onValue, Func<Error, Task<TResult>> onFirstError)
+    {
+        if (IsError)
+        {
+            return await onFirstError(FirstError);
+        }
+
+        return await onValue(Value);
     }
 }
 

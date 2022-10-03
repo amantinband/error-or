@@ -137,11 +137,31 @@ public record struct ErrorOr<TValue> : IErrorOr
         return onValue(Value);
     }
 
+    public Task<TResult> Match<TResult>(Func<TValue, Task<TResult>> onValue, Func<List<Error>, TResult> onError)
+    {
+        if (IsError)
+        {
+            return Task.FromResult(onError(Errors));
+        }
+
+        return onValue(Value);
+    }
+
     public TResult MatchFirst<TResult>(Func<TValue, TResult> onValue, Func<Error, TResult> onFirstError)
     {
         if (IsError)
         {
             return onFirstError(FirstError);
+        }
+
+        return onValue(Value);
+    }
+
+    public Task<TResult> MatchFirst<TResult>(Func<TValue, Task<TResult>> onValue, Func<Error, TResult> onFirstError)
+    {
+        if (IsError)
+        {
+            return Task.FromResult(onFirstError(FirstError));
         }
 
         return onValue(Value);

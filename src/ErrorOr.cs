@@ -146,6 +146,26 @@ public record struct ErrorOr<TValue> : IErrorOr
 
         return onValue(Value);
     }
+
+    public ErrorOr<TResult> Chain<TResult>(Func<TValue, ErrorOr<TResult>> onValue)
+    {
+        if (IsError)
+        {
+            return Errors;
+        }
+
+        return onValue(Value);
+    }
+
+    public Task<ErrorOr<TResult>> Chain<TResult>(Func<TValue, Task<ErrorOr<TResult>>> onValue)
+    {
+        if (IsError)
+        {
+            return Task.FromResult<ErrorOr<TResult>>(Errors);
+        }
+
+        return onValue(Value);
+    }
 }
 
 public static class ErrorOr

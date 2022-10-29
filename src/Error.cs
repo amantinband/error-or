@@ -49,7 +49,7 @@ public readonly record struct Error
         string code = "General.Failure",
         string description = "A failure has occurred.",
         Dictionary<string, object>? dictionary = null) =>
-            new(code, description, ErrorType.Failure);
+            new(code, description, ErrorType.Failure, dictionary);
 
     /// <summary>
     /// Creates an <see cref="Error"/> of type <see cref="ErrorType.Unexpected"/> from a code and description.
@@ -61,7 +61,7 @@ public readonly record struct Error
         string code = "General.Unexpected",
         string description = "An unexpected error has occurred.",
         Dictionary<string, object>? dictionary = null) =>
-            new(code, description, ErrorType.Unexpected);
+            new(code, description, ErrorType.Unexpected, dictionary);
 
     /// <summary>
     /// Creates an <see cref="Error"/> of type <see cref="ErrorType.Validation"/> from a code and description.
@@ -71,8 +71,9 @@ public readonly record struct Error
     /// <param name="dictionary">A dictionary which provides optional space for information.</param>
     public static Error Validation(
         string code = "General.Validation",
-        string description = "A validation error has occurred.") =>
-            new(code, description, ErrorType.Validation);
+        string description = "A validation error has occurred.",
+        Dictionary<string, object>? dictionary = null) =>
+            new(code, description, ErrorType.Validation, dictionary);
 
     /// <summary>
     /// Creates an <see cref="Error"/> of type <see cref="ErrorType.Conflict"/> from a code and description.
@@ -84,7 +85,7 @@ public readonly record struct Error
         string code = "General.Conflict",
         string description = "A conflict error has occurred.",
         Dictionary<string, object>? dictionary = null) =>
-            new(code, description, ErrorType.Conflict);
+            new(code, description, ErrorType.Conflict, dictionary);
 
     /// <summary>
     /// Creates an <see cref="Error"/> of type <see cref="ErrorType.NotFound"/> from a code and description.
@@ -96,7 +97,7 @@ public readonly record struct Error
         string code = "General.NotFound",
         string description = "A 'Not Found' error has occurred.",
         Dictionary<string, object>? dictionary = null) =>
-            new(code, description, ErrorType.NotFound);
+            new(code, description, ErrorType.NotFound, dictionary);
 
     /// <summary>
     /// Creates an <see cref="Error"/> of type <see cref="ErrorType.Unauthorized"/> from a code and description.
@@ -108,7 +109,7 @@ public readonly record struct Error
         string code = "General.Unauthorized",
         string description = "An 'Unauthorized' error has occurred.",
         Dictionary<string, object>? dictionary = null) =>
-            new(code, description, ErrorType.Unauthorized);
+            new(code, description, ErrorType.Unauthorized, dictionary);
 
     /// <summary>
     /// Creates an <see cref="Error"/> with the given numeric <paramref name="type"/>,
@@ -123,5 +124,5 @@ public readonly record struct Error
         string code,
         string description,
         Dictionary<string, object>? dictionary = null) =>
-            new(code, description, (ErrorType)type);
+            new(code, description, (ErrorType)type, dictionary);
 }

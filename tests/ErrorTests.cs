@@ -7,12 +7,17 @@ public class ErrorTests
 {
     private const string ErrorCode = "ErrorCode";
     private const string ErrorDescription = "ErrorDescription";
+    private static readonly Dictionary<string, object> Dictionary = new()
+    {
+        { "key1", "value1" },
+        { "key2", 21 },
+    };
 
     [Fact]
     public void CreateError_WhenFailureError_ShouldHaveErrorTypeFailure()
     {
         // Act
-        Error error = Error.Failure(ErrorCode, ErrorDescription);
+        Error error = Error.Failure(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.Failure);
@@ -22,7 +27,7 @@ public class ErrorTests
     public void CreateError_WhenUnexpectedError_ShouldHaveErrorTypeFailure()
     {
         // Act
-        Error error = Error.Unexpected(ErrorCode, ErrorDescription);
+        Error error = Error.Unexpected(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.Unexpected);
@@ -32,7 +37,7 @@ public class ErrorTests
     public void CreateError_WhenValidationError_ShouldHaveErrorTypeValidation()
     {
         // Act
-        Error error = Error.Validation(ErrorCode, ErrorDescription);
+        Error error = Error.Validation(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.Validation);
@@ -42,7 +47,7 @@ public class ErrorTests
     public void CreateError_WhenConflictError_ShouldHaveErrorTypeConflict()
     {
         // Act
-        Error error = Error.Conflict(ErrorCode, ErrorDescription);
+        Error error = Error.Conflict(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.Conflict);
@@ -52,7 +57,7 @@ public class ErrorTests
     public void CreateError_WhenNotFoundError_ShouldHaveErrorTypeNotFound()
     {
         // Act
-        Error error = Error.NotFound(ErrorCode, ErrorDescription);
+        Error error = Error.NotFound(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.NotFound);
@@ -62,7 +67,7 @@ public class ErrorTests
     public void CreateError_WhenCustomType_ShouldHaveCustomErrorType()
     {
         // Act
-        Error error = Error.Custom(1232, ErrorCode, ErrorDescription);
+        Error error = Error.Custom(1232, ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: (ErrorType)1232);
@@ -74,5 +79,6 @@ public class ErrorTests
         error.Description.Should().Be(ErrorDescription);
         error.Type.Should().Be(expectedErrorType);
         error.NumericType.Should().Be((int)expectedErrorType);
+        error.Dictionary.Should().BeEquivalentTo(Dictionary);
     }
 }

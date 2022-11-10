@@ -1,4 +1,4 @@
-﻿namespace ErrorOr;
+namespace ErrorOr;
 
 /// <summary>
 /// A discriminated union of errors or a value.
@@ -22,9 +22,14 @@ public record struct ErrorOr<TValue> : IErrorOr
     public bool IsError { get; }
 
     /// <summary>
-    /// Gets the list of errors.
+    /// Gets the list of errors. If the state is not error, the list will contain a single error representing the state.
     /// </summary>
     public List<Error> Errors => IsError ? _errors! : new List<Error> { NoErrors };
+
+    /// <summary>
+    /// Gets the list of errors. If the state is not error, the list will be empty.
+    /// </summary>
+    public List<Error> ErrorsOrEmptyList => IsError ? _errors! : new();
 
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.

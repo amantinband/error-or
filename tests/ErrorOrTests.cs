@@ -36,6 +36,20 @@ public class ErrorOrTests
     }
 
     [Fact]
+    public void CreateFromValue_WhenAccessingErrorsOrEmptyList_ShouldReturnEmptyList()
+    {
+        // Arrange
+        IEnumerable<string> value = new[] { "value" };
+        var errorOrPerson = ErrorOr.From(value);
+
+        // Act
+        var errors = errorOrPerson.ErrorsOrEmptyList;
+
+        // Assert
+        errors.Should().BeEmpty();
+    }
+
+    [Fact]
     public void CreateFromValue_WhenAccessingFirstError_ShouldReturnUnexpectedError()
     {
         // Arrange
@@ -54,13 +68,23 @@ public class ErrorOrTests
     {
         // Arrange
         var errors = new List<Error> { Error.Validation("User.Name", "Name is too short") };
-
-        // Act
         var errorOrPerson = ErrorOr<Person>.From(errors);
 
-        // Assert
+        // Act & Assert
         errorOrPerson.IsError.Should().BeTrue();
         errorOrPerson.Errors.Should().ContainSingle().Which.Should().Be(errors.Single());
+    }
+
+    [Fact]
+    public void CreateFromErrorList_WhenAccessingErrorsOrEmptyList_ShouldReturnErrorList()
+    {
+        // Arrange
+        var errors = new List<Error> { Error.Validation("User.Name", "Name is too short") };
+        var errorOrPerson = ErrorOr<Person>.From(errors);
+
+        // Act & Assert
+        errorOrPerson.IsError.Should().BeTrue();
+        errorOrPerson.ErrorsOrEmptyList.Should().ContainSingle().Which.Should().Be(errors.Single());
     }
 
     [Fact]

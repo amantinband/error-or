@@ -35,9 +35,10 @@
     - [From List of Errors, using `From`](#from-list-of-errors-using-from)
   - [Checking if the `ErrorOr<result>` is an error](#checking-if-the-errororresult-is-an-error)
   - [Accessing the `ErrorOr<result>` result](#accessing-the-errororresult-result)
-    - [Accessing the Value](#accessing-the-value)
-    - [Accessing the List of Errors](#accessing-the-list-of-errors)
-    - [Accessing the First Error](#accessing-the-first-error)
+    - [Accessing the Value (`result.Value`)](#accessing-the-value-resultvalue)
+    - [Accessing the List of Errors (`result.Errors`)](#accessing-the-list-of-errors-resulterrors)
+    - [Accessing the First Error (`result.FirstError`)](#accessing-the-first-error-resultfirsterror)
+    - [Accessing the Errors or an empty list (`result.ErrorsOrEmptyList`)](#accessing-the-errors-or-an-empty-list-resulterrorsoremptylist)
   - [Performing actions based on the `ErrorOr<result>` result](#performing-actions-based-on-the-errororresult-result)
     - [`Match`](#match)
     - [`MatchFirst`](#matchfirst)
@@ -392,7 +393,7 @@ if (errorOrResult.IsError)
 
 ## Accessing the `ErrorOr<result>` result
 
-### Accessing the Value
+### Accessing the Value (`result.Value`)
 
 ```csharp
 ErrorOr<int> result = 5;
@@ -400,7 +401,7 @@ ErrorOr<int> result = 5;
 var value = result.Value;
 ```
 
-### Accessing the List of Errors
+### Accessing the List of Errors (`result.Errors`)
 
 ```csharp
 ErrorOr<int> result = new List<Error> { Error.Unexpected(), Error.Validation() };
@@ -414,7 +415,7 @@ ErrorOr<int> result = Error.Unexpected();
 List<Error> value = result.Errors; // List<Error> { Error.Unexpected() }
 ```
 
-### Accessing the First Error
+### Accessing the First Error (`result.FirstError`)
 
 ```csharp
 ErrorOr<int> result = new List<Error> { Error.Unexpected(), Error.Validation() };
@@ -426,6 +427,20 @@ Error value = result.FirstError; // Error.Unexpected()
 ErrorOr<int> result = Error.Unexpected();
 
 Error value = result.FirstError; // Error.Unexpected()
+```
+
+### Accessing the Errors or an empty list (`result.ErrorsOrEmptyList`)
+
+```csharp
+ErrorOr<int> result = new List<Error> { Error.Unexpected(), Error.Validation() };
+
+List<Error> errors = result.ErrorsOrEmptyList; // List<Error> { Error.Unexpected(), Error.Validation() }
+```
+
+```csharp
+ErrorOr<int> result = ErrorOr.From(5);
+
+List<Error> errors = result.ErrorsOrEmptyList; // List<Error> { }
 ```
 
 ## Performing actions based on the `ErrorOr<result>` result

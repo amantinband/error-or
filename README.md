@@ -29,7 +29,7 @@
 - [Usage](#usage)
   - [Creating an `ErrorOr<result>`](#creating-an-errororresult)
     - [From Value, using implicit conversion](#from-value-using-implicit-conversion)
-    - [From Value, using `From`](#from-value-using-from)
+    - [From Value, using `ErrorOrFactory.From`](#from-value-using-errororfactoryfrom)
     - [From Single Error](#from-single-error)
     - [From List of Errors, using implicit conversion](#from-list-of-errors-using-implicit-conversion)
     - [From List of Errors, using `From`](#from-list-of-errors-using-from)
@@ -322,16 +322,16 @@ public ErrorOr<int> GetValue()
 }
 ```
 
-### From Value, using `From`
+### From Value, using `ErrorOrFactory.From`
 
 ```csharp
-ErrorOr<int> result = ErrorOr.From(5);
+ErrorOr<int> result = ErrorOrFactory.From(5);
 ```
 
 ```csharp
 public ErrorOr<int> GetValue()
 {
-    return ErrorOr.From(5);
+    return ErrorOrFactory.From(5);
 }
 ```
 
@@ -438,7 +438,7 @@ List<Error> errors = result.ErrorsOrEmptyList; // List<Error> { Error.Unexpected
 ```
 
 ```csharp
-ErrorOr<int> result = ErrorOr.From(5);
+ErrorOr<int> result = ErrorOrFactory.From(5);
 
 List<Error> errors = result.ErrorsOrEmptyList; // List<Error> { }
 ```

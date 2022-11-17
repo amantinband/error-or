@@ -8,6 +8,62 @@ public class ErrorOrTests
     private record Person(string Name);
 
     [Fact]
+    public void CreateFromFactory_WhenAccessingValue_ShouldReturnValue()
+    {
+        // Arrange
+        IEnumerable<string> value = new[] { "value" };
+
+        // Act
+        var errorOrPerson = ErrorOrFactory.From(value);
+
+        // Assert
+        errorOrPerson.IsError.Should().BeFalse();
+        errorOrPerson.Value.Should().BeSameAs(value);
+    }
+
+    [Fact]
+    public void CreateFromFactory_WhenAccessingErrors_ShouldReturnUnexpectedError()
+    {
+        // Arrange
+        IEnumerable<string> value = new[] { "value" };
+        var errorOrPerson = ErrorOrFactory.From(value);
+
+        // Act
+        var errors = errorOrPerson.Errors;
+
+        // Assert
+        errors.Should().ContainSingle().Which.Type.Should().Be(ErrorType.Unexpected);
+    }
+
+    [Fact]
+    public void CreateFromFactory_WhenAccessingErrorsOrEmptyList_ShouldReturnEmptyList()
+    {
+        // Arrange
+        IEnumerable<string> value = new[] { "value" };
+        var errorOrPerson = ErrorOrFactory.From(value);
+
+        // Act
+        var errors = errorOrPerson.ErrorsOrEmptyList;
+
+        // Assert
+        errors.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void CreateFromFactory_WhenAccessingFirstError_ShouldReturnUnexpectedError()
+    {
+        // Arrange
+        IEnumerable<string> value = new[] { "value" };
+        var errorOrPerson = ErrorOrFactory.From(value);
+
+        // Act
+        var firstError = errorOrPerson.FirstError;
+
+        // Assert
+        firstError.Type.Should().Be(ErrorType.Unexpected);
+    }
+
+    [Fact]
     public void CreateFromValue_WhenAccessingValue_ShouldReturnValue()
     {
         // Arrange

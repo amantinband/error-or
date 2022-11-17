@@ -1,4 +1,4 @@
-namespace ErrorOr;
+﻿namespace ErrorOr;
 
 /// <summary>
 /// A discriminated union of errors or a value.

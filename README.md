@@ -40,10 +40,10 @@
     - [Accessing the First Error (`result.FirstError`)](#accessing-the-first-error-resultfirsterror)
     - [Accessing the Errors or an empty list (`result.ErrorsOrEmptyList`)](#accessing-the-errors-or-an-empty-list-resulterrorsoremptylist)
   - [Performing actions based on the `ErrorOr<result>` result](#performing-actions-based-on-the-errororresult-result)
-    - [`Match`](#match)
-    - [`MatchFirst`](#matchfirst)
-    - [`Switch`](#switch)
-    - [`SwitchFirst`](#switchfirst)
+    - [`Match` / `MatchAsync`](#match--matchasync)
+    - [`MatchFirst` / `MatchFirstAsync`](#matchfirst--matchfirstasync)
+    - [`Switch` / `SwitchAsync`](#switch--switchasync)
+    - [`SwitchFirst` / `SwitchFirstAsync`](#switchfirst--switchfirstasync)
   - [Error Types](#error-types)
     - [Built-in Error Types](#built-in-error-types)
     - [Custom error types](#custom-error-types)
@@ -445,7 +445,7 @@ List<Error> errors = result.ErrorsOrEmptyList; // List<Error> { }
 
 ## Performing actions based on the `ErrorOr<result>` result
 
-### `Match`
+### `Match` / `MatchAsync`
 
 Actions that return a value on the value or list of errors
 
@@ -455,7 +455,13 @@ string foo = errorOrString.Match(
     errors => $"{errors.Count} errors occurred.");
 ```
 
-### `MatchFirst`
+```csharp
+string foo = await errorOrString.MatchAsync(
+    value => Task.FromResult(value),
+    errors => Task.FromResult($"{errors.Count} errors occurred."));
+```
+
+### `MatchFirst` / `MatchFirstAsync`
 
 Actions that return a value on the value or first error
 
@@ -465,7 +471,13 @@ string foo = errorOrString.MatchFirst(
     firstError => firstError.Description);
 ```
 
-### `Switch`
+```csharp
+string foo = await errorOrString.MatchFirstAsync(
+    value => Task.FromResult(value),
+    firstError => Task.FromResult(firstError.Description));
+```
+
+### `Switch` / `SwitchAsync`
 
 Actions that don't return a value on the value or list of errors
 
@@ -475,7 +487,13 @@ errorOrString.Switch(
     errors => Console.WriteLine($"{errors.Count} errors occurred."));
 ```
 
-### `SwitchFirst`
+```csharp
+await errorOrString.SwitchAsync(
+    value => { Console.WriteLine(value); return Task.CompletedTask; },
+    errors => { Console.WriteLine($"{errors.Count} errors occurred."); return Task.CompletedTask; });
+```
+
+### `SwitchFirst` / `SwitchFirstAsync`
 
 Actions that don't return a value on the value or first error
 
@@ -483,6 +501,12 @@ Actions that don't return a value on the value or first error
 errorOrString.SwitchFirst(
     value => Console.WriteLine(value),
     firstError => Console.WriteLine(firstError.Description));
+```
+
+```csharp
+await errorOrString.SwitchFirstAsync(
+    value => { Console.WriteLine(value); return Task.CompletedTask; },
+    firstError => { Console.WriteLine(firstError.Description); return Task.CompletedTask; });
 ```
 
 ## Error Types

@@ -125,11 +125,11 @@ public record struct ErrorOr<TValue> : IErrorOr
     {
         if (IsError)
         {
-            await onError(Errors);
+            await onError(Errors).ConfigureAwait(false);
             return;
         }
 
-        await onValue(Value);
+        await onValue(Value).ConfigureAwait(false);
     }
 
     public void SwitchFirst(Action<TValue> onValue, Action<Error> onFirstError)
@@ -147,11 +147,11 @@ public record struct ErrorOr<TValue> : IErrorOr
     {
         if (IsError)
         {
-            await onFirstError(FirstError);
+            await onFirstError(FirstError).ConfigureAwait(false);
             return;
         }
 
-        await onValue(Value);
+        await onValue(Value).ConfigureAwait(false);
     }
 
     public TResult Match<TResult>(Func<TValue, TResult> onValue, Func<List<Error>, TResult> onError)
@@ -168,10 +168,10 @@ public record struct ErrorOr<TValue> : IErrorOr
     {
         if (IsError)
         {
-            return await onError(Errors);
+            return await onError(Errors).ConfigureAwait(false);
         }
 
-        return await onValue(Value);
+        return await onValue(Value).ConfigureAwait(false);
     }
 
     public TResult MatchFirst<TResult>(Func<TValue, TResult> onValue, Func<Error, TResult> onFirstError)
@@ -188,10 +188,10 @@ public record struct ErrorOr<TValue> : IErrorOr
     {
         if (IsError)
         {
-            return await onFirstError(FirstError);
+            return await onFirstError(FirstError).ConfigureAwait(false);
         }
 
-        return await onValue(Value);
+        return await onValue(Value).ConfigureAwait(false);
     }
 }
 

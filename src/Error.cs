@@ -8,22 +8,22 @@ public readonly record struct Error
     /// <summary>
     /// Gets the unique error code.
     /// </summary>
-    public string Code { get; }
+    public string Code { get; init; }
 
     /// <summary>
     /// Gets the error description.
     /// </summary>
-    public string Description { get; }
+    public string Description { get; init; }
 
     /// <summary>
     /// Gets the error type.
     /// </summary>
-    public ErrorType Type { get; }
+    public ErrorType Type { get; init; }
 
     /// <summary>
     /// Gets the numeric value of the type.
     /// </summary>
-    public int NumericType { get; }
+    public int NumericType { get; init; }
 
     private Error(string code, string description, ErrorType type)
     {

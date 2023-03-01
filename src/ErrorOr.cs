@@ -5,9 +5,6 @@ namespace ErrorOr;
 /// </summary>
 public record struct ErrorOr<TValue> : IErrorOr
 {
-    private readonly TValue? _value = default;
-    private readonly List<Error>? _errors = null;
-
     private static readonly Error NoFirstError = Error.Unexpected(
         code: "ErrorOr.NoFirstError",
         description: "First error cannot be retrieved from a successful ErrorOr.");
@@ -19,17 +16,17 @@ public record struct ErrorOr<TValue> : IErrorOr
     /// <summary>
     /// Gets a value indicating whether the state is error.
     /// </summary>
-    public bool IsError { get; }
+    public bool IsError { get; init; }
 
     /// <summary>
     /// Gets the list of errors. If the state is not error, the list will contain a single error representing the state.
     /// </summary>
-    public List<Error> Errors => IsError ? _errors! : new List<Error> { NoErrors };
+    public List<Error> Errors { get; init; }
 
     /// <summary>
     /// Gets the list of errors. If the state is not error, the list will be empty.
     /// </summary>
-    public List<Error> ErrorsOrEmptyList => IsError ? _errors! : new();
+    public List<Error> ErrorsOrEmptyList { get; init; }
 
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
@@ -42,7 +39,7 @@ public record struct ErrorOr<TValue> : IErrorOr
     /// <summary>
     /// Gets the value.
     /// </summary>
-    public TValue Value => _value!;
+    public TValue Value { get; init; } = default!;
 
     /// <summary>
     /// Gets the first error.
@@ -56,26 +53,30 @@ public record struct ErrorOr<TValue> : IErrorOr
                 return NoFirstError;
             }
 
-            return _errors![0];
+            return Errors![0];
         }
     }
 
     private ErrorOr(Error error)
     {
-        _errors = new List<Error> { error };
+        Errors = new List<Error> { error };
+        ErrorsOrEmptyList = Errors;
         IsError = true;
     }
 
     private ErrorOr(List<Error> errors)
     {
-        _errors = errors;
+        Errors = errors;
+        ErrorsOrEmptyList = errors;
         IsError = true;
     }
 
     private ErrorOr(TValue value)
     {
-        _value = value;
+        Value = value;
         IsError = false;
+        Errors = new List<Error> { NoErrors };
+        ErrorsOrEmptyList = new();
     }
 
     /// <summary>

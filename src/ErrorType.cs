@@ -10,4 +10,5 @@ public enum ErrorType
     Validation,
     Conflict,
     NotFound,
+    NotAuthorized
 }

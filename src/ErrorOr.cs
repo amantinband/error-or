@@ -22,6 +22,11 @@ public record struct ErrorOr<TValue> : IErrorOr
     public bool IsError { get; }
 
     /// <summary>
+    /// Gets a value indicating whether the state is success (error didn't happen).
+    /// </summary>
+    public bool IsSuccess { get => !IsError; }
+
+    /// <summary>
     /// Gets the list of errors. If the state is not error, the list will contain a single error representing the state.
     /// </summary>
     public List<Error> Errors => IsError ? _errors! : new List<Error> { NoErrors };

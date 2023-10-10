@@ -94,6 +94,16 @@ public readonly record struct Error
         new(code, description, ErrorType.Unauthorized);
 
     /// <summary>
+    /// Creates an <see cref="Error"/> of type <see cref="ErrorType.Forbidden"/> from a code and description.
+    /// </summary>
+    /// <param name="code">The unique error code.</param>
+    /// <param name="description">The error description.</param>
+    public static Error Forbidden(
+        string code = "General.Forbidden",
+        string description = "An 'Forbidden' error has occurred.") =>
+        new(code, description, ErrorType.Forbidden);
+
+    /// <summary>
     /// Creates an <see cref="Error"/> with the given numeric <paramref name="type"/>,
     /// <paramref name="code"/>, and <paramref name="description"/>.
     /// </summary>

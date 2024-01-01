@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <PackageId>ErrorOr</PackageId>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <Authors>Amichai Mantinband</Authors>
     <PackageIcon>icon-square.png</PackageIcon>
     <PackageTags>Result,Results,ErrorOr,Error,Handling</PackageTags>

@@ -3,7 +3,7 @@ namespace ErrorOr;
 /// <summary>
 /// A discriminated union of errors or a value.
 /// </summary>
-public record struct ErrorOr<TValue> : IErrorOr
+public readonly record struct ErrorOr<TValue> : IErrorOr<TValue>
 {
     private readonly TValue? _value = default;
     private readonly List<Error>? _errors = null;

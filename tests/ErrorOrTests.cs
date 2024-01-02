@@ -70,7 +70,7 @@ public class ErrorOrTests
         IEnumerable<string> value = new[] { "value" };
 
         // Act
-        var errorOrPerson = ErrorOr.From(value);
+        var errorOrPerson = ErrorOrFactory.From(value);
 
         // Assert
         errorOrPerson.IsError.Should().BeFalse();
@@ -82,7 +82,7 @@ public class ErrorOrTests
     {
         // Arrange
         IEnumerable<string> value = new[] { "value" };
-        var errorOrPerson = ErrorOr.From(value);
+        var errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
         var errors = errorOrPerson.Errors;
@@ -96,7 +96,7 @@ public class ErrorOrTests
     {
         // Arrange
         IEnumerable<string> value = new[] { "value" };
-        var errorOrPerson = ErrorOr.From(value);
+        var errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
         var errors = errorOrPerson.ErrorsOrEmptyList;
@@ -110,7 +110,7 @@ public class ErrorOrTests
     {
         // Arrange
         IEnumerable<string> value = new[] { "value" };
-        var errorOrPerson = ErrorOr.From(value);
+        var errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
         var firstError = errorOrPerson.FirstError;

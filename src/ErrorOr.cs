@@ -259,21 +259,36 @@ public readonly record struct ErrorOr<TValue> : IErrorOr<TValue>
 
         return await onValue(Value).ConfigureAwait(false);
     }
-}
 
-/// <summary>
-/// Provides utility methods for creating instances of <see ref="ErrorOr{T}"/>.
-/// </summary>
-public static class ErrorOr
-{
     /// <summary>
-    /// Creates an <see ref="ErrorOr{TValue}"/> instance from a value.
+    /// If the state is a value, the provided function <paramref name="onValue"/> is executed and its result is returned.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="value">The value from which to create an ErrorOr instance.</param>
-    /// <returns>An <see ref="ErrorOr{TValue}"/> instance containing the specified value.</returns>
-    public static ErrorOr<TValue> From<TValue>(TValue value)
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="onValue">The function to execute if the state is a value.</param>
+    /// <returns>The result from calling <paramref name="onValue"/> if state is value; otherwise the original <see cref="Errors"/>.</returns>
+    public ErrorOr<TResult> Chain<TResult>(Func<TValue, ErrorOr<TResult>> onValue)
     {
-        return value;
+        if (IsError)
+        {
+            return Errors;
+        }
+
+        return onValue(Value);
+    }
+
+    /// <summary>
+    /// If the state is a value, the provided function <paramref name="onValue"/> is executed asynchronously and its result is returned.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="onValue">The function to execute if the state is a value.</param>
+    /// <returns>The result from calling <paramref name="onValue"/> if state is value; otherwise the original <see cref="Errors"/>.</returns>
+    public async Task<ErrorOr<TResult>> ChainAsync<TResult>(Func<TValue, Task<ErrorOr<TResult>>> onValue)
+    {
+        if (IsError)
+        {
+            return Errors;
+        }
+
+        return await onValue(Value);
     }
 }

@@ -30,15 +30,6 @@ public readonly record struct Error
     /// </summary>
     public Dictionary<string, object>? Dictionary { get; }
 
-    private Error(string code, string description, ErrorType type, Dictionary<string, object>? dictionary)
-    {
-        Code = code;
-        Description = description;
-        Type = type;
-        NumericType = (int)type;
-        Dictionary = dictionary;
-    }
-
     /// <summary>
     /// Creates an <see cref="Error"/> of type <see cref="ErrorType.Failure"/> from a code and description.
     /// </summary>
@@ -125,4 +116,13 @@ public readonly record struct Error
         string description,
         Dictionary<string, object>? dictionary = null) =>
             new(code, description, (ErrorType)type, dictionary);
+
+    private Error(string code, string description, ErrorType type, Dictionary<string, object>? dictionary)
+    {
+        Code = code;
+        Description = description;
+        Type = type;
+        NumericType = (int)type;
+        Dictionary = dictionary;
+    }
 }

@@ -37,7 +37,7 @@ public static class ErrorOrExtensions
     /// </summary>
     /// <param name="errorOr">The error.</param>
     /// <param name="onError">The function to execute if the state is error.</param>
-    /// <returns>The result from calling <paramref name="onError"/> if state is value; otherwise the original errors.</returns>
+    /// <returns>The result from calling <paramref name="onError"/> if state is error; otherwise the original value.</returns>
     public static async Task<TValue> Else<TValue>(this Task<ErrorOr<TValue>> errorOr, Func<List<Error>, TValue> onError)
     {
         var result = await errorOr.ConfigureAwait(false);
@@ -50,7 +50,7 @@ public static class ErrorOrExtensions
     /// </summary>
     /// <param name="errorOr">The error.</param>
     /// <param name="onError">The function to execute if the state is error.</param>
-    /// <returns>The result from calling <paramref name="onError"/> if state is value; otherwise the original errors.</returns>
+    /// <returns>The result from calling <paramref name="onError"/> if state is error; otherwise the original value.</returns>
     public static async Task<TValue> Else<TValue>(this Task<ErrorOr<TValue>> errorOr, TValue onError)
     {
         var result = await errorOr.ConfigureAwait(false);
@@ -63,7 +63,7 @@ public static class ErrorOrExtensions
     /// </summary>
     /// <param name="errorOr">The error.</param>
     /// <param name="onError">The function to execute if the state is error.</param>
-    /// <returns>The result from calling <paramref name="onError"/> if state is value; otherwise the original errors.</returns>
+    /// <returns>The result from calling <paramref name="onError"/> if state is error; otherwise the original value.</returns>
     public static async Task<TValue> ElseAsync<TValue>(this Task<ErrorOr<TValue>> errorOr, Func<List<Error>, Task<TValue>> onError)
     {
         var result = await errorOr.ConfigureAwait(false);
@@ -76,7 +76,7 @@ public static class ErrorOrExtensions
     /// </summary>
     /// <param name="errorOr">The error.</param>
     /// <param name="onError">The function to execute if the state is error.</param>
-    /// <returns>The result from calling <paramref name="onError"/> if state is value; otherwise the original errors.</returns>
+    /// <returns>The result from calling <paramref name="onError"/> if state is error; otherwise the original value.</returns>
     public static async Task<TValue> ElseAsync<TValue>(this Task<ErrorOr<TValue>> errorOr, Task<TValue> onError)
     {
         var result = await errorOr.ConfigureAwait(false);

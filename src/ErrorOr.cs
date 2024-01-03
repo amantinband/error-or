@@ -296,7 +296,7 @@ public readonly record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// If the state is error, the provided function <paramref name="onError"/> is executed and its result is returned.
     /// </summary>
     /// <param name="onError">The function to execute if the state is error.</param>
-    /// <returns>The result from calling <paramref name="onError"/> if state is value; otherwise the original <see cref="Errors"/>.</returns>
+    /// <returns>The result from calling <paramref name="onError"/> if state is error; otherwise the original <see cref="Value"/>.</returns>
     public TValue Else(Func<List<Error>, TValue> onError)
     {
         if (!IsError)
@@ -311,7 +311,7 @@ public readonly record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// If the state is error, the provided function <paramref name="onError"/> is executed and its result is returned.
     /// </summary>
     /// <param name="onError">The value to return if the state is error.</param>
-    /// <returns>The result from calling <paramref name="onError"/> if state is value; otherwise the original <see cref="Errors"/>.</returns>
+    /// <returns>The result from calling <paramref name="onError"/> if state is error; otherwise the original <see cref="Value"/>.</returns>
     public TValue Else(TValue onError)
     {
         if (!IsError)
@@ -326,7 +326,7 @@ public readonly record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// If the state is error, the provided function <paramref name="onError"/> is executed asynchronously and its result is returned.
     /// </summary>
     /// <param name="onError">The function to execute if the state is error.</param>
-    /// <returns>The result from calling <paramref name="onError"/> if state is value; otherwise the original <see cref="Errors"/>.</returns>
+    /// <returns>The result from calling <paramref name="onError"/> if state is error; otherwise the original <see cref="Value"/>.</returns>
     public async Task<TValue> ElseAsync(Func<List<Error>, Task<TValue>> onError)
     {
         if (!IsError)
@@ -341,7 +341,7 @@ public readonly record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// If the state is error, the provided function <paramref name="onError"/> is executed asynchronously and its result is returned.
     /// </summary>
     /// <param name="onError">The function to execute if the state is error.</param>
-    /// <returns>The result from calling <paramref name="onError"/> if state is value; otherwise the original <see cref="Errors"/>.</returns>
+    /// <returns>The result from calling <paramref name="onError"/> if state is error; otherwise the original <see cref="Value"/>.</returns>
     public async Task<TValue> ElseAsync(Task<TValue> onError)
     {
         if (!IsError)

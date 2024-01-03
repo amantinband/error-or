@@ -14,6 +14,6 @@ public static class ErrorOrExtensions
     {
         var result = await errorOr;
 
-        return await result.ChainAsync(onValue);
+        return await result.ChainAsync(onValue).ConfigureAwait(false);
     }
 }

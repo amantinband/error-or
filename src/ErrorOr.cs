@@ -289,6 +289,6 @@ public readonly record struct ErrorOr<TValue> : IErrorOr<TValue>
             return Errors;
         }
 
-        return await onValue(Value);
+        return await onValue(Value).ConfigureAwait(false);
     }
 }

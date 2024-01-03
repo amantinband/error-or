@@ -17,16 +17,16 @@
 </div>
 
 - [Give it a star ⭐!](#give-it-a-star-)
-- [Getting Started](#getting-started)
+- [Getting Started 🏃](#getting-started-)
   - [Single Error](#single-error)
     - [This 👇🏽](#this-)
     - [Turns into this 👇🏽](#turns-into-this-)
     - [This 👇🏽](#this--1)
     - [Turns into this 👇🏽](#turns-into-this--1)
   - [Multiple Errors](#multiple-errors)
-- [A more practical example](#a-more-practical-example)
-- [Dropping the exceptions throwing logic](#dropping-the-exceptions-throwing-logic)
-- [Usage](#usage)
+- [A more practical example 👷](#a-more-practical-example-)
+- [Dropping the exceptions throwing logic ✈️](#dropping-the-exceptions-throwing-logic-️)
+- [Usage 🛠️](#usage-️)
   - [Creating an `ErrorOr<result>`](#creating-an-errororresult)
     - [From Value, using implicit conversion](#from-value-using-implicit-conversion)
     - [From Value, using `ErrorOrFactory.From`](#from-value-using-errororfactoryfrom)
@@ -44,21 +44,22 @@
     - [`MatchFirst` / `MatchFirstAsync`](#matchfirst--matchfirstasync)
     - [`Switch` / `SwitchAsync`](#switch--switchasync)
     - [`SwitchFirst` / `SwitchFirstAsync`](#switchfirst--switchfirstasync)
+    - [`Chain` / `ChainAsync`](#chain--chainasync)
   - [Error Types](#error-types)
     - [Built-in Error Types](#built-in-error-types)
     - [Custom error types](#custom-error-types)
     - [Why would I want to categorize my errors?](#why-would-i-want-to-categorize-my-errors)
   - [Built in result types](#built-in-result-types)
-- [How Is This Different From `OneOf<T0, T1>` or `FluentResults`?](#how-is-this-different-from-oneoft0-t1-or-fluentresults)
-- [Contribution](#contribution)
-- [Credits](#credits)
-- [License](#license)
+- [How Is This Different From `OneOf<T0, T1>` or `FluentResults`? 🤔](#how-is-this-different-from-oneoft0-t1-or-fluentresults-)
+- [Contribution 🤲](#contribution-)
+- [Credits 🙏](#credits-)
+- [License 🪪](#license-)
 
 # Give it a star ⭐!
 
 Loving it? Show your support by giving this project a star!
 
-# Getting Started
+# Getting Started 🏃
 
 ## Single Error
 
@@ -197,7 +198,7 @@ public async Task<ErrorOr<User>> CreateUserAsync(string name)
 }
 ```
 
-# A more practical example
+# A more practical example 👷
 
 ```csharp
 [HttpGet("{id:guid}")]
@@ -247,7 +248,7 @@ return createUserResult.MatchFirst(
     error => error is Errors.User.DuplicateEmail ? Conflict() : InternalServerError());
 ```
 
-# Dropping the exceptions throwing logic
+# Dropping the exceptions throwing logic ✈️
 
 You have validation logic such as `MediatR` behaviors, you can drop the exceptions throwing logic and simply return a list of errors from the pipeline behavior
 
@@ -303,7 +304,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 }
 ```
 
-# Usage
+# Usage 🛠️
 
 ## Creating an `ErrorOr<result>`
 
@@ -509,6 +510,42 @@ await errorOrString.SwitchFirstAsync(
     firstError => { Console.WriteLine(firstError.Description); return Task.CompletedTask; });
 ```
 
+### `Chain` / `ChainAsync`
+
+Multiple methods that return `ErrorOr<T>` can be chained as follows
+
+```csharp
+static ErrorOr<string> ConvertToString(int num) => num.ToString();
+static ErrorOr<int> ConvertToInt(string str) => int.Parse(str);
+
+ErrorOr<string> errorOrString = "5";
+
+ErrorOr<string> result = errorOrString
+    .Chain(str => ConvertToInt(str))
+    .Chain(num => ConvertToString(num))
+    .Chain(str => ConvertToInt(str))
+    .Chain(num => ConvertToString(num))
+    .Chain(str => ConvertToInt(str))
+    .Chain(num => ConvertToString(num));
+```
+
+```csharp
+static Task<ErrorOr<string>> ConvertToString(int num) => Task.FromResult(ErrorOrFactory.From(num.ToString()));
+static Task<ErrorOr<int>> ConvertToInt(string str) => Task.FromResult(ErrorOrFactory.From(int.Parse(str)));
+
+ErrorOr<string> errorOrString = "5";
+
+ErrorOr<string> result = await errorOrString
+    .ChainAsync(str => ConvertToInt(str))
+    .ChainAsync(num => ConvertToString(num))
+    .ChainAsync(str => ConvertToInt(str))
+    .ChainAsync(num => ConvertToString(num))
+    .ChainAsync(str => ConvertToInt(str))
+    .ChainAsync(num => ConvertToString(num));
+```
+
+If any of the methods return an error, the chain will be broken and the error will be returned.
+
 ## Error Types
 
 ### Built-in Error Types
@@ -599,19 +636,19 @@ ErrorOr<Deleted> DeleteUser(Guid id)
 }
 ```
 
-# How Is This Different From `OneOf<T0, T1>` or `FluentResults`?
+# How Is This Different From `OneOf<T0, T1>` or `FluentResults`? 🤔
 
 It's similar to the others, just aims to be more intuitive and fluent.
 If you find yourself typing `OneOf<User, DomainError>` or `Result.Fail<User>("failure")` again and again, you might enjoy the fluent API of `ErrorOr<User>` (and it's also faster).
 
-# Contribution
+# Contribution 🤲
 
 If you have any questions, comments, or suggestions, please open an issue or create a pull request 🙂
 
-# Credits
+# Credits 🙏
 
 - [OneOf](https://github.com/mcintyre321/OneOf/tree/master/OneOf) - An awesome library which provides F# style discriminated unions behavior for C#
 
-# License
+# License 🪪
 
 This project is licensed under the terms of the [MIT](https://github.com/mantinband/error-or/blob/main/LICENSE) license.

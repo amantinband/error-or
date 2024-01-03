@@ -1,4 +1,4 @@
-namespace UnitTests;
+namespace Tests;
 
 using ErrorOr;
 using FluentAssertions;

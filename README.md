@@ -44,7 +44,8 @@
     - [`MatchFirst` / `MatchFirstAsync`](#matchfirst--matchfirstasync)
     - [`Switch` / `SwitchAsync`](#switch--switchasync)
     - [`SwitchFirst` / `SwitchFirstAsync`](#switchfirst--switchfirstasync)
-    - [`Chain` / `ChainAsync`](#chain--chainasync)
+    - [`Then` / `ThenAsync`](#then--thenasync)
+    - [`Else` / `ElseAsync`](#else--elseasync)
   - [Error Types](#error-types)
     - [Built-in Error Types](#built-in-error-types)
     - [Custom error types](#custom-error-types)
@@ -510,9 +511,9 @@ await errorOrString.SwitchFirstAsync(
     firstError => { Console.WriteLine(firstError.Description); return Task.CompletedTask; });
 ```
 
-### `Chain` / `ChainAsync`
+### `Then` / `ThenAsync`
 
-Multiple methods that return `ErrorOr<T>` can be chained as follows
+Multiple methods that return `ErrorOr<T>` can be chained as follows:
 
 ```csharp
 static ErrorOr<string> ConvertToString(int num) => num.ToString();
@@ -521,30 +522,66 @@ static ErrorOr<int> ConvertToInt(string str) => int.Parse(str);
 ErrorOr<string> errorOrString = "5";
 
 ErrorOr<string> result = errorOrString
-    .Chain(str => ConvertToInt(str))
-    .Chain(num => ConvertToString(num))
-    .Chain(str => ConvertToInt(str))
-    .Chain(num => ConvertToString(num))
-    .Chain(str => ConvertToInt(str))
-    .Chain(num => ConvertToString(num));
+    .Then(str => ConvertToInt(str))
+    .Then(num => ConvertToString(num))
+    .Then(str => ConvertToInt(str))
+    .Then(num => ConvertToString(num));
 ```
 
 ```csharp
-static Task<ErrorOr<string>> ConvertToString(int num) => Task.FromResult(ErrorOrFactory.From(num.ToString()));
-static Task<ErrorOr<int>> ConvertToInt(string str) => Task.FromResult(ErrorOrFactory.From(int.Parse(str)));
+static ErrorOr<string> ConvertToString(int num) => num.ToString();
+static Task<ErrorOr<string>> ConvertToStringAsync(int num) => Task.FromResult(ErrorOrFactory.From(num.ToString()));
+static Task<ErrorOr<int>> ConvertToIntAsync(string str) => Task.FromResult(ErrorOrFactory.From(int.Parse(str)));
 
 ErrorOr<string> errorOrString = "5";
 
 ErrorOr<string> result = await errorOrString
-    .ChainAsync(str => ConvertToInt(str))
-    .ChainAsync(num => ConvertToString(num))
-    .ChainAsync(str => ConvertToInt(str))
-    .ChainAsync(num => ConvertToString(num))
-    .ChainAsync(str => ConvertToInt(str))
-    .ChainAsync(num => ConvertToString(num));
+    .ThenAsync(str => ConvertToIntAsync(str))
+    .ThenAsync(num => ConvertToStringAsync(num))
+    .ThenAsync(str => ConvertToIntAsync(str))
+    .ThenAsync(num => ConvertToStringAsync(num));
+
+// mixing `ThenAsync` and `Then`
+ErrorOr<string> result = await errorOrString
+    .ThenAsync(str => ConvertToIntAsync(str))
+    .Then(num => ConvertToString(num))
+    .ThenAsync(str => ConvertToIntAsync(str))
+    .Then(num => ConvertToString(num));
 ```
 
-If any of the methods return an error, the chain will be broken and the error will be returned.
+If any of the methods return an error, the chain will break and the errors will be returned.
+
+### `Else` / `ElseAsync`
+
+The `Else` / `ElseAsync` methods can be used to specify a fallback value in case the state is error anywhere in the chain.
+
+```csharp
+// ignoring the errors
+string result = errorOrString
+    .Then(str => ConvertToInt(str))
+    .Then(num => ConvertToString(num))
+    .Else("fallback value");
+
+// using the errors
+string result = errorOrString
+    .Then(str => ConvertToInt(str))
+    .Then(num => ConvertToString(num))
+    .Else(errors => $"{errors.Count} errors occurred.");
+```
+
+```csharp
+// ignoring the errors
+string result = await errorOrString
+    .ThenAsync(str => ConvertToInt(str))
+    .ThenAsync(num => ConvertToString(num))
+    .ElseAsync(Task.FromResult("fallback value"));
+
+// using the errors
+string result = await errorOrString
+    .ThenAsync(str => ConvertToInt(str))
+    .ThenAsync(num => ConvertToString(num))
+    .ElseAsync(errors => Task.FromResult($"{errors.Count} errors occurred."));
+```
 
 ## Error Types
 

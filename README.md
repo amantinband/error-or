@@ -25,7 +25,7 @@
     - [Turns into this 👇🏽](#turns-into-this--1)
   - [Multiple Errors](#multiple-errors)
 - [A more practical example 👷](#a-more-practical-example-)
-- [Dropping the exceptions throwing logic ✈️](#dropping-the-exceptions-throwing-logic-️)
+- [Dropping the exceptions throwing logic 😎](#dropping-the-exceptions-throwing-logic-)
 - [Usage 🛠️](#usage-️)
   - [Creating an `ErrorOr<result>`](#creating-an-errororresult)
     - [From Value, using implicit conversion](#from-value-using-implicit-conversion)
@@ -182,12 +182,12 @@ public class User
 ```csharp
 public async Task<ErrorOr<User>> CreateUserAsync(string name)
 {
-    if (await _userRepository.GetAsync(name) is User user)
+    if (await _userRepository.GetAsync(name) is not null)
     {
         return Error.Conflict("User already exists");
     }
 
-    var errorOrUser = User.Create("Amichai");
+    var errorOrUser = User.Create(name);
 
     if (errorOrUser.IsError)
     {
@@ -214,30 +214,42 @@ public async Task<IActionResult> GetUser(Guid Id)
         errors => ValidationProblem(errors.ToModelStateDictionary()));
 }
 ```
+
+Or, using `Then`/`Else`:
+
+```csharp
+[HttpGet("{id:guid}")]
+public async Task<IActionResult> GetUser(Guid Id)
+{
+    return await _mediator.Send(new GetUserQuery(Id))
+        .Then(user => _mapper.Map<UserResponse>(user))
+        .Then(userResponse => Ok(userResponse))
+        .Else(errors => ValidationProblem(errors.ToModelStateDictionary()));
+}
+```
+
 A nice approach, is creating a static class with the expected errors. For example:
 
 ```csharp
-public static partial class Errors
+public static partial class UserErrors
 {
-    public static class User
-    {
-        public static Error NotFound = Error.NotFound("User.NotFound", "User not found.");
-        public static Error DuplicateEmail = Error.Conflict("User.DuplicateEmail", "User with given email already exists.");
-    }
+    public static Error DuplicateEmail = Error.Conflict(
+        code: "User.DuplicateEmail",
+        description: "User with given email already exists.");
 }
 ```
 
 Which can later be used as following
 
 ```csharp
-
-User newUser = ..;
-if (await _userRepository.GetByEmailAsync(newUser.email) is not null)
+if (await _userRepository.GetByEmailAsync(email) is not null)
 {
-    return Errors.User.DuplicateEmail;
+    return UserErrors.DuplicateEmail;
 }
 
+User newUser = User.Create(email, password);
 await _userRepository.AddAsync(newUser);
+
 return newUser;
 ```
 
@@ -249,28 +261,24 @@ return createUserResult.MatchFirst(
     error => error is Errors.User.DuplicateEmail ? Conflict() : InternalServerError());
 ```
 
-# Dropping the exceptions throwing logic ✈️
+# Dropping the exceptions throwing logic 😎
 
 You have validation logic such as `MediatR` behaviors, you can drop the exceptions throwing logic and simply return a list of errors from the pipeline behavior
 
 ```csharp
-public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
-    where TResponse : IErrorOr
+public class ValidationBehavior<TRequest, TResponse>(IValidator<TRequest>? validator = null)
+    : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
+        where TResponse : IErrorOr
 {
-    private readonly IValidator<TRequest>? _validator;
-
-    public ValidationBehavior(IValidator<TRequest>? validator = null)
-    {
-        _validator = validator;
-    }
+    private readonly IValidator<TRequest>? _validator = validator;
 
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (_validator == null)
+        if (_validator is null)
         {
             return await next();
         }
@@ -282,25 +290,12 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
             return await next();
         }
 
-        return TryCreateResponseFromErrors(validationResult.Errors, out var response)
-            ? response
-            : throw new ValidationException(validationResult.Errors);
-    }
+        var errors = validationResult.Errors
+            .ConvertAll(error => Error.Validation(
+                code: error.PropertyName,
+                description: error.ErrorMessage));
 
-    private static bool TryCreateResponseFromErrors(List<ValidationFailure> validationFailures, out TResponse response)
-    {
-        List<Error> errors = validationFailures.ConvertAll(x => Error.Validation(
-                code: x.PropertyName,
-                description: x.ErrorMessage));
-
-        response = (TResponse?)typeof(TResponse)
-            .GetMethod(
-                name: nameof(ErrorOr<object>.From),
-                bindingAttr: BindingFlags.Static | BindingFlags.Public,
-                types: new[] { typeof(List<Error>) })?
-            .Invoke(null, new[] { errors })!;
-
-        return response is not null;
+        return (dynamic)errors;
     }
 }
 ```
@@ -597,17 +592,20 @@ public enum ErrorType
     Validation,
     Conflict,
     NotFound,
+    Unauthorized,
 }
 ```
 
 Creating a new Error instance is done using one of the following static methods:
 
 ```csharp
-public static Error Error.Failure(string code, string description);
-public static Error Error.Unexpected(string code, string description);
-public static Error Error.Validation(string code, string description);
-public static Error Error.Conflict(string code, string description);
-public static Error Error.NotFound(string code, string description);
+public static Error Error.Failure(string code, string description, Dictionary<string, object>? metadata = null);
+public static Error Error.Unexpected(string code, string description, Dictionary<string, object>? metadata = null);
+public static Error Error.Validation(string code, string description, Dictionary<string, object>? metadata = null)
+public static Error Error.Unexpected(string code, string description, Dictionary<string, object>? metadata = null);
+public static Error Error.Conflict(string code, string description, Dictionary<string, object>? metadata = null);
+public static Error Error.NotFound(string code, string description, Dictionary<string, object>? metadata = null);
+public static Error Error.Unauthorized(string code, string description, Dictionary<string, object>? metadata = null);
 ```
 
 The `ErrorType` enum is a good way to categorize errors.

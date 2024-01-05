@@ -14,15 +14,16 @@ public class ThenTests
         // Act
         ErrorOr<string> result = errorOrString
             .Then(str => ConvertToInt(str))
+            .Then(num => num * 2)
             .Then(num => ConvertToString(num));
 
         // Assert
         result.IsError.Should().BeFalse();
-        result.Value.Should().BeEquivalentTo(errorOrString.Value);
+        result.Value.Should().BeEquivalentTo("10");
     }
 
     [Fact]
-    public void CallingThen_WhenHasError_ShouldReturnErrors()
+    public void CallingThen_WhenIsError_ShouldReturnErrors()
     {
         // Arrange
         ErrorOr<string> errorOrString = Error.NotFound();
@@ -30,6 +31,7 @@ public class ThenTests
         // Act
         ErrorOr<string> result = errorOrString
             .Then(str => ConvertToInt(str))
+            .Then(num => num * 2)
             .Then(num => ConvertToString(num));
 
         // Assert
@@ -39,6 +41,24 @@ public class ThenTests
 
     [Fact]
     public async Task CallingThenAfterThenAsync_WhenIsSuccess_ShouldInvokeGivenFunc()
+    {
+        // Arrange
+        ErrorOr<string> errorOrString = "5";
+
+        // Act
+        ErrorOr<int> result = await errorOrString
+            .ThenAsync(str => ConvertToIntAsync(str))
+            .Then(num => num * 2)
+            .ThenAsync(num => ConvertToStringAsync(num))
+            .Then(str => ConvertToInt(str));
+
+        // Assert
+        result.IsError.Should().BeFalse();
+        result.Value.Should().Be(10);
+    }
+
+    [Fact]
+    public async Task CallingThenAfterThenAsync_WhenIsError_ShouldReturnErrors()
     {
         // Arrange
         ErrorOr<string> errorOrString = Error.NotFound();
@@ -58,4 +78,6 @@ public class ThenTests
     private static ErrorOr<int> ConvertToInt(string str) => int.Parse(str);
 
     private static Task<ErrorOr<int>> ConvertToIntAsync(string str) => Task.FromResult(ErrorOrFactory.From(int.Parse(str)));
+
+    private static Task<ErrorOr<string>> ConvertToStringAsync(int num) => Task.FromResult(ErrorOrFactory.From(num.ToString()));
 }

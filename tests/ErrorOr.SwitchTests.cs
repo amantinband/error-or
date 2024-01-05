@@ -8,7 +8,7 @@ public class SwitchTests
     private record Person(string Name);
 
     [Fact]
-    public void SwitchErrorOr_WhenHasValue_ShouldExecuteOnValueAction()
+    public void SwitchErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -25,7 +25,7 @@ public class SwitchTests
     }
 
     [Fact]
-    public void SwitchErrorOr_WhenHasError_ShouldExecuteOnErrorAction()
+    public void SwitchErrorOr_WhenIsError_ShouldExecuteOnErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
@@ -42,7 +42,7 @@ public class SwitchTests
     }
 
     [Fact]
-    public void SwitchFirstErrorOr_WhenHasValue_ShouldExecuteOnValueAction()
+    public void SwitchFirstErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -59,7 +59,7 @@ public class SwitchTests
     }
 
     [Fact]
-    public void SwitchFirstErrorOr_WhenHasError_ShouldExecuteOnFirstErrorAction()
+    public void SwitchFirstErrorOr_WhenIsError_ShouldExecuteOnFirstErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };

@@ -8,7 +8,7 @@ public class MatchTests
     private record Person(string Name);
 
     [Fact]
-    public void MatchErrorOr_WhenHasValue_ShouldExecuteOnValueAction()
+    public void MatchErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -30,7 +30,7 @@ public class MatchTests
     }
 
     [Fact]
-    public void MatchErrorOr_WhenHasError_ShouldExecuteOnErrorAction()
+    public void MatchErrorOr_WhenIsError_ShouldExecuteOnErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
@@ -52,7 +52,7 @@ public class MatchTests
     }
 
     [Fact]
-    public void MatchFirstErrorOr_WhenHasValue_ShouldExecuteOnValueAction()
+    public void MatchFirstErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -74,7 +74,7 @@ public class MatchTests
     }
 
     [Fact]
-    public void MatchFirstErrorOr_WhenHasError_ShouldExecuteOnFirstErrorAction()
+    public void MatchFirstErrorOr_WhenIsError_ShouldExecuteOnFirstErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };

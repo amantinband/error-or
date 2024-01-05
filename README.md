@@ -215,19 +215,6 @@ public async Task<IActionResult> GetUser(Guid Id)
 }
 ```
 
-Or, using `Then`/`Else`:
-
-```csharp
-[HttpGet("{id:guid}")]
-public async Task<IActionResult> GetUser(Guid Id)
-{
-    return await _mediator.Send(new GetUserQuery(Id))
-        .Then(user => _mapper.Map<UserResponse>(user))
-        .Then(userResponse => Ok(userResponse))
-        .Else(errors => ValidationProblem(errors.ToModelStateDictionary()));
-}
-```
-
 A nice approach, is creating a static class with the expected errors. For example:
 
 ```csharp

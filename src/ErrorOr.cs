@@ -277,12 +277,44 @@ public readonly record struct ErrorOr<TValue> : IErrorOr<TValue>
     }
 
     /// <summary>
+    /// If the state is a value, the provided function <paramref name="onValue"/> is executed and its result is returned.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="onValue">The function to execute if the state is a value.</param>
+    /// <returns>The result from calling <paramref name="onValue"/> if state is value; otherwise the original <see cref="Errors"/>.</returns>
+    public ErrorOr<TResult> Then<TResult>(Func<TValue, TResult> onValue)
+    {
+        if (IsError)
+        {
+            return Errors;
+        }
+
+        return onValue(Value);
+    }
+
+    /// <summary>
     /// If the state is a value, the provided function <paramref name="onValue"/> is executed asynchronously and its result is returned.
     /// </summary>
     /// <typeparam name="TResult">The type of the result.</typeparam>
     /// <param name="onValue">The function to execute if the state is a value.</param>
     /// <returns>The result from calling <paramref name="onValue"/> if state is value; otherwise the original <see cref="Errors"/>.</returns>
     public async Task<ErrorOr<TResult>> ThenAsync<TResult>(Func<TValue, Task<ErrorOr<TResult>>> onValue)
+    {
+        if (IsError)
+        {
+            return Errors;
+        }
+
+        return await onValue(Value).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// If the state is a value, the provided function <paramref name="onValue"/> is executed asynchronously and its result is returned.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="onValue">The function to execute if the state is a value.</param>
+    /// <returns>The result from calling <paramref name="onValue"/> if state is value; otherwise the original <see cref="Errors"/>.</returns>
+    public async Task<ErrorOr<TResult>> ThenAsync<TResult>(Func<TValue, Task<TResult>> onValue)
     {
         if (IsError)
         {

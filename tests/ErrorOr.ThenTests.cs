@@ -31,6 +31,7 @@ public class ThenTests
         // Act
         ErrorOr<string> result = errorOrString
             .Then(str => ConvertToInt(str))
+            .Then(num => num * 2)
             .Then(num => ConvertToString(num));
 
         // Assert

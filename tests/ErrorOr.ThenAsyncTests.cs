@@ -31,6 +31,7 @@ public class ThenAsyncTests
         // Act
         ErrorOr<string> result = await errorOrString
             .ThenAsync(str => ConvertToIntAsync(str))
+            .ThenAsync(num => Task.FromResult(num * 2))
             .ThenAsync(num => ConvertToStringAsync(num));
 
         // Assert

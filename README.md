@@ -19,12 +19,8 @@
 - [Give it a star ⭐!](#give-it-a-star-)
 - [Getting Started 🏃](#getting-started-)
   - [Single Error](#single-error)
-    - [This 👇🏽](#this-)
-    - [Turns into this 👇🏽](#turns-into-this-)
-    - [This 👇🏽](#this--1)
-    - [Turns into this 👇🏽](#turns-into-this--1)
   - [Multiple Errors](#multiple-errors)
-- [A more practical example 👷](#a-more-practical-example-)
+- [A more practical example 🧑‍🏫](#a-more-practical-example-)
 - [Dropping the exceptions throwing logic 😎](#dropping-the-exceptions-throwing-logic-)
 - [Usage 🛠️](#usage-️)
   - [Creating an `ErrorOr<result>`](#creating-an-errororresult)
@@ -64,75 +60,61 @@ Loving it? Show your support by giving this project a star!
 
 ## Single Error
 
-### This 👇🏽
+This 👇
 
-```csharp
-User GetUser(Guid id = default)
+```cs
+public float Divide(int a, int b)
 {
-    if (id == default)
+    if (b == 0)
     {
-        throw new ValidationException("Id is required");
+        throw new Exception("Cannot divide by zero");
     }
 
-    return new User(Name: "Amichai");
+    return a / b;
 }
 ```
 
-```csharp
-try
-{
-    var user = GetUser();
-    Console.WriteLine(user.Name);
-}
-catch (Exception e)
-{
-    Console.WriteLine(e.Message);
-}
-```
+Turns into this 👇
 
-### Turns into this 👇🏽
-
-```csharp
-ErrorOr<User> GetUser(Guid id = default)
+```cs
+public ErrorOr<float> Divide(int a, int b)
 {
-    if (id == default)
+    if (b == 0)
     {
-        return Error.Validation("Id is required");
+        return Error.Unexpected(description: "Cannot divide by zero");
     }
 
-    return new User(Name: "Amichai");
+    return a / b;
 }
 ```
 
-```csharp
-errorOrUser.SwitchFirst(
-    user => Console.WriteLine(user.Name),
-    error => Console.WriteLine(error.Description));
-```
-
-### This 👇🏽
+Then, in an outer layer, you can use the `IsError` property to check if an error occurred, and the `Value` property to get the result.
 
 ```csharp
-void AddUser(User user)
+[HttpPost("divide")]
+public IActionResult Divide(int a, int b)
 {
-    if (!_users.TryAdd(user))
+    ErrorOr<float> result = Divide(a, b);
+
+    if (result.IsError)
     {
-        throw new Exception("Failed to add user");
+        return Problem();
     }
+
+    return Ok(result.Value);
 }
 ```
 
-### Turns into this 👇🏽
+Alternatively, you can use the `Match` which will invoke the appropriate action based on whether the result is an error or not.
 
 ```csharp
-ErrorOr<Created> AddUser(User user)
+public IActionResult Divide(int a, int b)
 {
-    if (!_users.TryAdd(user))
-    {
-        return Error.Failure(description: "Failed to add user");
-    }
+    ErrorOr<float> result = Divide(a, b);
 
-    return Result.Created;
+    return result.Match(
+        val => Ok(val),
+        errors => Problem());
 }
 ```
 
@@ -141,18 +123,11 @@ ErrorOr<Created> AddUser(User user)
 Internally, the `ErrorOr` object has a list of `Error`s, so if you have multiple errors, you don't need to compromise and have only the first one.
 
 ```csharp
-public class User
+public class User(string _name)
 {
-    public string Name { get; }
-
-    private User(string name)
-    {
-        Name = name;
-    }
-
     public static ErrorOr<User> Create(string name)
     {
-        List<Error> errors = new();
+        List<Error> errors = [];
 
         if (name.Length < 2)
         {
@@ -174,32 +149,12 @@ public class User
             return errors;
         }
 
-        return new User(firstName, lastName);
+        return new User(name);
     }
 }
 ```
 
-```csharp
-public async Task<ErrorOr<User>> CreateUserAsync(string name)
-{
-    if (await _userRepository.GetAsync(name) is not null)
-    {
-        return Error.Conflict("User already exists");
-    }
-
-    var errorOrUser = User.Create(name);
-
-    if (errorOrUser.IsError)
-    {
-        return errorOrUser.Errors;
-    }
-
-    await _userRepository.AddAsync(errorOrUser.Value);
-    return errorOrUser.Value;
-}
-```
-
-# A more practical example 👷
+# A more practical example 🧑‍🏫
 
 ```csharp
 [HttpGet("{id:guid}")]
@@ -209,43 +164,44 @@ public async Task<IActionResult> GetUser(Guid Id)
 
     ErrorOr<User> getUserResponse = await _mediator.Send(getUserQuery);
 
-    return getUserResponse.Match(
-        user => Ok(_mapper.Map<UserResponse>(user)),
-        errors => ValidationProblem(errors.ToModelStateDictionary()));
+    return getUserResponse
+        .Then(user => _mapper.Map<UserResponse>(user)) // will only be invoked if the result is not an error
+        .Match(onValue: Ok, onError: Problem);
 }
 ```
 
 A nice approach, is creating a static class with the expected errors. For example:
 
 ```csharp
-public static partial class UserErrors
+public static partial class DivisionErrors
 {
-    public static Error DuplicateEmail = Error.Conflict(
-        code: "User.DuplicateEmail",
-        description: "User with given email already exists.");
+    public static Error CannotDivideByZero = Error.Unexpected(
+        code: "Division.CannotDivideByZero",
+        description: "Cannot divide by zero.");
 }
 ```
 
-Which can later be used as following
+Which can later be used as following 👇
 
 ```csharp
-if (await _userRepository.GetByEmailAsync(email) is not null)
+public ErrorOr<float> Divide(int a, int b)
 {
-    return UserErrors.DuplicateEmail;
+    if (b == 0)
+    {
+        return DivisionErrors.CannotDivideByZero;
+    }
+
+    return a / b;
 }
-
-User newUser = User.Create(email, password);
-await _userRepository.AddAsync(newUser);
-
-return newUser;
 ```
 
 Then, in an outer layer, you can use the `Error.Match` method to return the appropriate HTTP status code.
 
 ```csharp
-return createUserResult.MatchFirst(
-    user => CreatedAtRoute("GetUser", new { id = user.Id }, user),
-    error => error is Errors.User.DuplicateEmail ? Conflict() : InternalServerError());
+return Divide(a, b)
+    .MatchFirst(
+        onValue: user => CreatedAtRoute("GetUser", new { id = user.Id }, user),
+        onError: error => error is DivisionErrors.CannotDivideByZero ? BadRequest() : InternalServerError());
 ```
 
 # Dropping the exceptions throwing logic 😎

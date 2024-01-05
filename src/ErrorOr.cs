@@ -277,6 +277,23 @@ public readonly record struct ErrorOr<TValue> : IErrorOr<TValue>
     }
 
     /// <summary>
+    /// If the state is a value, the provided <paramref name="action"/> is invoked.
+    /// </summary>
+    /// <param name="action">The action to execute if the state is a value.</param>
+    /// <returns>The original <see cref="ErrorOr"/> instance.</returns>
+    public ErrorOr<TValue> Then(Action<TValue> action)
+    {
+        if (IsError)
+        {
+            return Errors;
+        }
+
+        action(Value);
+
+        return this;
+    }
+
+    /// <summary>
     /// If the state is a value, the provided function <paramref name="onValue"/> is executed and its result is returned.
     /// </summary>
     /// <typeparam name="TResult">The type of the result.</typeparam>
@@ -306,6 +323,23 @@ public readonly record struct ErrorOr<TValue> : IErrorOr<TValue>
         }
 
         return await onValue(Value).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// If the state is a value, the provided <paramref name="action"/> is invoked asynchronously.
+    /// </summary>
+    /// <param name="action">The action to execute if the state is a value.</param>
+    /// <returns>The original <see cref="ErrorOr"/> instance.</returns>
+    public async Task<ErrorOr<TValue>> ThenAsync(Func<TValue, Task> action)
+    {
+        if (IsError)
+        {
+            return Errors;
+        }
+
+        await action(Value).ConfigureAwait(false);
+
+        return this;
     }
 
     /// <summary>

@@ -18,20 +18,17 @@
 
 - [Give it a star ⭐!](#give-it-a-star-)
 - [Getting Started 🏃](#getting-started-)
-  - [Single Error](#single-error)
-  - [Multiple Errors](#multiple-errors)
-- [A more practical example 🧑‍🏫](#a-more-practical-example-)
-- [Dropping the exceptions throwing logic 😎](#dropping-the-exceptions-throwing-logic-)
+  - [Replace throwing exceptions with `ErrorOr<T>`](#replace-throwing-exceptions-with-errorort)
+  - [Return Multiple Errors When Needed](#return-multiple-errors-when-needed)
+  - [`ErrorOr<T>` in ASP.NET](#errorort-in-aspnet)
+  - [Organizing your errors](#organizing-your-errors)
+- [Mediator + FluentValidation + `ErrorOr` 🤝](#mediator--fluentvalidation--erroror-)
 - [Usage 🛠️](#usage-️)
-  - [Creating an `ErrorOr<result>`](#creating-an-errororresult)
+  - [Creating an `ErrorOr<TResult>`](#creating-an-errorortresult)
     - [From Value, using implicit conversion](#from-value-using-implicit-conversion)
     - [From Value, using `ErrorOrFactory.From`](#from-value-using-errororfactoryfrom)
     - [From Single Error](#from-single-error)
     - [From List of Errors, using implicit conversion](#from-list-of-errors-using-implicit-conversion)
-    - [From List of Errors, using `From`](#from-list-of-errors-using-from)
-  - [Checking if the `ErrorOr<result>` is an error](#checking-if-the-errororresult-is-an-error)
-  - [Accessing the `ErrorOr<result>` result](#accessing-the-errororresult-result)
-    - [Accessing the Value (`result.Value`)](#accessing-the-value-resultvalue)
     - [Accessing the List of Errors (`result.Errors`)](#accessing-the-list-of-errors-resulterrors)
     - [Accessing the First Error (`result.FirstError`)](#accessing-the-first-error-resultfirsterror)
     - [Accessing the Errors or an empty list (`result.ErrorsOrEmptyList`)](#accessing-the-errors-or-an-empty-list-resulterrorsoremptylist)
@@ -58,11 +55,22 @@ Loving it? Show your support by giving this project a star!
 
 # Getting Started 🏃
 
-## Single Error
+## Replace throwing exceptions with `ErrorOr<T>`
 
 This 👇
 
 ```cs
+try
+{
+    var result = Divide(4, 2);
+    Console.WriteLine(result * 2); // 4
+}
+catch (Exception e)
+{
+    Console.WriteLine(e.Message);
+    return;
+}
+
 public float Divide(int a, int b)
 {
     if (b == 0)
@@ -77,6 +85,16 @@ public float Divide(int a, int b)
 Turns into this 👇
 
 ```cs
+var result = Divide(4, 2);
+
+if (result.IsError)
+{
+    Console.WriteLine(result.FirstError.Description);
+    return;
+}
+
+Console.WriteLine(result.Value * 2); // 4
+
 public ErrorOr<float> Divide(int a, int b)
 {
     if (b == 0)
@@ -88,37 +106,20 @@ public ErrorOr<float> Divide(int a, int b)
 }
 ```
 
-Then, in an outer layer, you can use the `IsError` property to check if an error occurred, and the `Value` property to get the result.
+Or, using [Then](#then--thenasync)/[Else](#else--elseasync) and [Switch](#switch--switchasync)/[Match](#match--matchasync), you can do this 👇
 
-```csharp
-[HttpPost("divide")]
-public IActionResult Divide(int a, int b)
-{
-    ErrorOr<float> result = Divide(a, b);
+```cs
 
-    if (result.IsError)
-    {
-        return Problem();
-    }
+Divide(4, 2)
+    .Then(val => val * 2) // you can chain multiple `Then` methods. They will only be invoked if the result is not an error
+    .SwitchFirst(
+        onValue: Console.WriteLine, // 4
+        onFirstError: error => Console.WriteLine(error.Description));
 
-    return Ok(result.Value);
-}
+public ErrorOr<float> Divide(int a, int b); // same as above
 ```
 
-Alternatively, you can use the `Match` which will invoke the appropriate action based on whether the result is an error or not.
-
-```csharp
-public IActionResult Divide(int a, int b)
-{
-    ErrorOr<float> result = Divide(a, b);
-
-    return result.Match(
-        val => Ok(val),
-        errors => Problem());
-}
-```
-
-## Multiple Errors
+## Return Multiple Errors When Needed
 
 Internally, the `ErrorOr` object has a list of `Error`s, so if you have multiple errors, you don't need to compromise and have only the first one.
 
@@ -154,7 +155,7 @@ public class User(string _name)
 }
 ```
 
-# A more practical example 🧑‍🏫
+##  `ErrorOr<T>` in ASP.NET
 
 ```csharp
 [HttpGet("{id:guid}")]
@@ -169,6 +170,8 @@ public async Task<IActionResult> GetUser(Guid Id)
         .Match(onValue: Ok, onError: Problem);
 }
 ```
+
+## Organizing your errors
 
 A nice approach, is creating a static class with the expected errors. For example:
 
@@ -204,9 +207,17 @@ return Divide(a, b)
         onError: error => error is DivisionErrors.CannotDivideByZero ? BadRequest() : InternalServerError());
 ```
 
-# Dropping the exceptions throwing logic 😎
+# [Mediator](https://github.com/jbogard/MediatR) + [FluentValidation](https://github.com/FluentValidation/FluentValidation) + `ErrorOr` 🤝
 
-You have validation logic such as `MediatR` behaviors, you can drop the exceptions throwing logic and simply return a list of errors from the pipeline behavior
+A common approach when using `MediatR` is to use `FluentValidation` to validate the request before it reaches the handler.
+
+Usually, the validation is done using a `Behavior` that throws an exception if the request is invalid.
+
+Using `ErrorOr`, we can create a `Behavior` that returns an error instead of throwing an exception.
+
+This plays nicely when the project uses `ErrorOr`, as the layer invoking the `Mediator`, similar to other components in the project, simply receives an `ErrorOr` and can handle it accordingly.
+
+Here is an example of a `Behavior` that validates the request and returns an error if it's invalid 👇
 
 ```csharp
 public class ValidationBehavior<TRequest, TResponse>(IValidator<TRequest>? validator = null)
@@ -245,7 +256,7 @@ public class ValidationBehavior<TRequest, TResponse>(IValidator<TRequest>? valid
 
 # Usage 🛠️
 
-## Creating an `ErrorOr<result>`
+## Creating an `ErrorOr<TResult>`
 
 There are implicit converters from `TResult`, `Error`, `List<Error>` to `ErrorOr<TResult>`
 
@@ -278,7 +289,7 @@ public ErrorOr<int> GetValue()
 ### From Single Error
 
 ```csharp
-ErrorOr<int> result = Error.Unexpected();
+ErrorOr<int> result = Error.Unexpected(me);
 ```
 
 ```csharp
@@ -303,42 +314,6 @@ public ErrorOr<int> GetValue()
         Error.Validation()
     };
 }
-```
-
-### From List of Errors, using `From`
-
-```csharp
-ErrorOr<int> result = ErrorOr<int>.From(new List<Error> { Error.Unexpected(), Error.Validation() });
-```
-
-```csharp
-public ErrorOr<int> GetValue()
-{
-    return ErrorOr<int>.From(List<Error>
-    {
-        Error.Unexpected(),
-        Error.Validation()
-    };
-}
-```
-
-## Checking if the `ErrorOr<result>` is an error
-
-```csharp
-if (errorOrResult.IsError)
-{
-    // errorOrResult is an error
-}
-```
-
-## Accessing the `ErrorOr<result>` result
-
-### Accessing the Value (`result.Value`)
-
-```csharp
-ErrorOr<int> result = 5;
-
-var value = result.Value;
 ```
 
 ### Accessing the List of Errors (`result.Errors`)

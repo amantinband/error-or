@@ -23,6 +23,23 @@ public class ThenTests
     }
 
     [Fact]
+    public void CallingThen_WhenIsSuccess_ShouldInvokeGivenAction()
+    {
+        // Arrange
+        ErrorOr<string> errorOrString = "5";
+
+        // Act
+        ErrorOr<int> result = errorOrString
+            .Then(str => { _ = 5; })
+            .Then(str => ConvertToInt(str))
+            .Then(str => { _ = 5; });
+
+        // Assert
+        result.IsError.Should().BeFalse();
+        result.Value.Should().Be(5);
+    }
+
+    [Fact]
     public void CallingThen_WhenIsError_ShouldReturnErrors()
     {
         // Arrange
@@ -32,6 +49,7 @@ public class ThenTests
         ErrorOr<string> result = errorOrString
             .Then(str => ConvertToInt(str))
             .Then(num => num * 2)
+            .Then(str => { _ = 5; })
             .Then(num => ConvertToString(num));
 
         // Assert
@@ -46,15 +64,17 @@ public class ThenTests
         ErrorOr<string> errorOrString = "5";
 
         // Act
-        ErrorOr<int> result = await errorOrString
+        ErrorOr<string> result = await errorOrString
             .ThenAsync(str => ConvertToIntAsync(str))
             .Then(num => num * 2)
             .ThenAsync(num => ConvertToStringAsync(num))
-            .Then(str => ConvertToInt(str));
+            .Then(str => ConvertToInt(str))
+            .ThenAsync(num => ConvertToStringAsync(num))
+            .Then(num => { _ = 5; });
 
         // Assert
         result.IsError.Should().BeFalse();
-        result.Value.Should().Be(10);
+        result.Value.Should().Be("10");
     }
 
     [Fact]

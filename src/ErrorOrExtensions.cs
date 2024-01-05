@@ -5,12 +5,12 @@ public static class ErrorOrExtensions
     /// <summary>
     /// If the state of <paramref name="errorOr"/> is a value, the provided function <paramref name="onValue"/> is executed and its result is returned.
     /// </summary>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    /// <typeparam name="TNextResult">The type of the next result.</typeparam>
+    /// <typeparam name="TValue">The type of the result.</typeparam>
+    /// <typeparam name="TNextValue">The type of the next result.</typeparam>
     /// <param name="errorOr">The error.</param>
     /// <param name="onValue">The function to execute if the state is a value.</param>
     /// <returns>The result from calling <paramref name="onValue"/> if state is value; otherwise the original errors.</returns>
-    public static async Task<ErrorOr<TNextResult>> Then<TResult, TNextResult>(this Task<ErrorOr<TResult>> errorOr, Func<TResult, ErrorOr<TNextResult>> onValue)
+    public static async Task<ErrorOr<TNextValue>> Then<TValue, TNextValue>(this Task<ErrorOr<TValue>> errorOr, Func<TValue, ErrorOr<TNextValue>> onValue)
     {
         var result = await errorOr.ConfigureAwait(false);
 
@@ -20,12 +20,12 @@ public static class ErrorOrExtensions
     /// <summary>
     /// If the state of <paramref name="errorOr"/> is a value, the provided function <paramref name="onValue"/> is executed and its result is returned.
     /// </summary>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    /// <typeparam name="TNextResult">The type of the next result.</typeparam>
+    /// <typeparam name="TValue">The type of the result.</typeparam>
+    /// <typeparam name="TNextValue">The type of the next result.</typeparam>
     /// <param name="errorOr">The error.</param>
     /// <param name="onValue">The function to execute if the state is a value.</param>
     /// <returns>The result from calling <paramref name="onValue"/> if state is value; otherwise the original errors.</returns>
-    public static async Task<ErrorOr<TNextResult>> Then<TResult, TNextResult>(this Task<ErrorOr<TResult>> errorOr, Func<TResult, TNextResult> onValue)
+    public static async Task<ErrorOr<TNextValue>> Then<TValue, TNextValue>(this Task<ErrorOr<TValue>> errorOr, Func<TValue, TNextValue> onValue)
     {
         var result = await errorOr.ConfigureAwait(false);
 
@@ -33,14 +33,28 @@ public static class ErrorOrExtensions
     }
 
     /// <summary>
+    /// If the state of <paramref name="errorOr"/> is a value, the provided <paramref name="action"/> is invoked.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the result.</typeparam>
+    /// <param name="errorOr">The error.</param>
+    /// <param name="action">The action to execute if the state is a value.</param>
+    /// <returns>The original <paramref name="errorOr"/>.</returns>
+    public static async Task<ErrorOr<TValue>> Then<TValue>(this Task<ErrorOr<TValue>> errorOr, Action<TValue> action)
+    {
+        var result = await errorOr.ConfigureAwait(false);
+
+        return result.Then(action);
+    }
+
+    /// <summary>
     /// If the state of <paramref name="errorOr"/> is a value, the provided function <paramref name="onValue"/> is executed asynchronously and its result is returned.
     /// </summary>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    /// <typeparam name="TNextResult">The type of the next result.</typeparam>
+    /// <typeparam name="TValue">The type of the result.</typeparam>
+    /// <typeparam name="TNextValue">The type of the next result.</typeparam>
     /// <param name="errorOr">The error.</param>
     /// <param name="onValue">The function to execute if the state is a value.</param>
     /// <returns>The result from calling <paramref name="onValue"/> if state is value; otherwise the original errors.</returns>
-    public static async Task<ErrorOr<TNextResult>> ThenAsync<TResult, TNextResult>(this Task<ErrorOr<TResult>> errorOr, Func<TResult, Task<ErrorOr<TNextResult>>> onValue)
+    public static async Task<ErrorOr<TNextValue>> ThenAsync<TValue, TNextValue>(this Task<ErrorOr<TValue>> errorOr, Func<TValue, Task<ErrorOr<TNextValue>>> onValue)
     {
         var result = await errorOr.ConfigureAwait(false);
 
@@ -50,16 +64,30 @@ public static class ErrorOrExtensions
     /// <summary>
     /// If the state of <paramref name="errorOr"/> is a value, the provided function <paramref name="onValue"/> is executed asynchronously and its result is returned.
     /// </summary>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    /// <typeparam name="TNextResult">The type of the next result.</typeparam>
+    /// <typeparam name="TValue">The type of the result.</typeparam>
+    /// <typeparam name="TNextValue">The type of the next result.</typeparam>
     /// <param name="errorOr">The error.</param>
     /// <param name="onValue">The function to execute if the state is a value.</param>
     /// <returns>The result from calling <paramref name="onValue"/> if state is value; otherwise the original errors.</returns>
-    public static async Task<ErrorOr<TNextResult>> ThenAsync<TResult, TNextResult>(this Task<ErrorOr<TResult>> errorOr, Func<TResult, Task<TNextResult>> onValue)
+    public static async Task<ErrorOr<TNextValue>> ThenAsync<TValue, TNextValue>(this Task<ErrorOr<TValue>> errorOr, Func<TValue, Task<TNextValue>> onValue)
     {
         var result = await errorOr.ConfigureAwait(false);
 
         return await result.ThenAsync(onValue).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// If the state of <paramref name="errorOr"/> is a value, the provided <paramref name="action"/> is executed asynchronously.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the result.</typeparam>
+    /// <param name="errorOr">The error.</param>
+    /// <param name="action">The action to execute if the state is a value.</param>
+    /// <returns>The original <paramref name="errorOr"/>.</returns>
+    public static async Task<ErrorOr<TValue>> ThenAsync<TValue>(this Task<ErrorOr<TValue>> errorOr, Func<TValue, Task> action)
+    {
+        var result = await errorOr.ConfigureAwait(false);
+
+        return await result.ThenAsync(action).ConfigureAwait(false);
     }
 
     /// <summary>

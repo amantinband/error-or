@@ -8,7 +8,7 @@ public class MatchAsyncTests
     private record Person(string Name);
 
     [Fact]
-    public async Task MatchAsyncErrorOr_WhenHasValue_ShouldExecuteOnValueAction()
+    public async Task MatchAsyncErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -30,7 +30,7 @@ public class MatchAsyncTests
     }
 
     [Fact]
-    public async Task MatchAsyncErrorOr_WhenHasError_ShouldExecuteOnErrorAction()
+    public async Task MatchAsyncErrorOr_WhenIsError_ShouldExecuteOnErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
@@ -52,7 +52,7 @@ public class MatchAsyncTests
     }
 
     [Fact]
-    public async Task MatchFirstAsyncErrorOr_WhenHasValue_ShouldExecuteOnValueAction()
+    public async Task MatchFirstAsyncErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -74,7 +74,7 @@ public class MatchAsyncTests
     }
 
     [Fact]
-    public async Task MatchFirstAsyncErrorOr_WhenHasError_ShouldExecuteOnFirstErrorAction()
+    public async Task MatchFirstAsyncErrorOr_WhenIsError_ShouldExecuteOnFirstErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };

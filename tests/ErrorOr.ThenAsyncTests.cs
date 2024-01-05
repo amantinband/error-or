@@ -19,11 +19,11 @@ public class ThenAsyncTests
 
         // Assert
         result.IsError.Should().BeFalse();
-        result.Value.Should().BeEquivalentTo(errorOrString.Value);
+        result.Value.Should().BeEquivalentTo("10");
     }
 
     [Fact]
-    public async Task CallingThenAsync_WhenHasError_ShouldReturnErrors()
+    public async Task CallingThenAsync_WhenIsError_ShouldReturnErrors()
     {
         // Arrange
         ErrorOr<string> errorOrString = Error.NotFound();

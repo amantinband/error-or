@@ -8,7 +8,7 @@ public class SwitchAsyncTests
     private record Person(string Name);
 
     [Fact]
-    public async Task SwitchAsyncErrorOr_WhenHasValue_ShouldExecuteOnValueAction()
+    public async Task SwitchAsyncErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -25,7 +25,7 @@ public class SwitchAsyncTests
     }
 
     [Fact]
-    public async Task SwitchAsyncErrorOr_WhenHasError_ShouldExecuteOnErrorAction()
+    public async Task SwitchAsyncErrorOr_WhenIsError_ShouldExecuteOnErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
@@ -42,7 +42,7 @@ public class SwitchAsyncTests
     }
 
     [Fact]
-    public async Task SwitchAsyncFirstErrorOr_WhenHasValue_ShouldExecuteOnValueAction()
+    public async Task SwitchAsyncFirstErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -59,7 +59,7 @@ public class SwitchAsyncTests
     }
 
     [Fact]
-    public async Task SwitchFirstAsyncErrorOr_WhenHasError_ShouldExecuteOnFirstErrorAction()
+    public async Task SwitchFirstAsyncErrorOr_WhenIsError_ShouldExecuteOnFirstErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };

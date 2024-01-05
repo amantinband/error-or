@@ -8,7 +8,7 @@ public class MatchAsyncTests
     private record Person(string Name);
 
     [Fact]
-    public async Task MatchAsyncErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
+    public async Task CallingMatchAsync_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -30,7 +30,7 @@ public class MatchAsyncTests
     }
 
     [Fact]
-    public async Task MatchAsyncErrorOr_WhenIsError_ShouldExecuteOnErrorAction()
+    public async Task CallingMatchAsync_WhenIsError_ShouldExecuteOnErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
@@ -52,7 +52,7 @@ public class MatchAsyncTests
     }
 
     [Fact]
-    public async Task MatchFirstAsyncErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
+    public async Task CallingMatchFirstAsync_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -74,7 +74,7 @@ public class MatchAsyncTests
     }
 
     [Fact]
-    public async Task MatchFirstAsyncErrorOr_WhenIsError_ShouldExecuteOnFirstErrorAction()
+    public async Task CallingMatchFirstAsync_WhenIsError_ShouldExecuteOnFirstErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
@@ -91,6 +91,51 @@ public class MatchAsyncTests
         var action = async () => await errorOrPerson.MatchFirstAsync(
             OnValueAction,
             OnFirstErrorAction);
+
+        // Assert
+        (await action.Should().NotThrowAsync()).Subject.Should().Be("Nice");
+    }
+
+    [Fact]
+    public async Task CallingMatchFirstAsyncAfterThenAsync_WhenIsSuccess_ShouldExecuteOnValueAction()
+    {
+        // Arrange
+        ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
+        Task<string> OnValueAction(Person _) => throw new Exception("Should not be called");
+        Task<string> OnFirstErrorAction(Error errors)
+        {
+            errors.Should().BeEquivalentTo(errorOrPerson.Errors[0])
+                .And.BeEquivalentTo(errorOrPerson.FirstError);
+
+            return Task.FromResult("Nice");
+        }
+
+        // Act
+        var action = () => errorOrPerson
+            .ThenAsync(person => Task.FromResult(person))
+            .MatchFirstAsync(OnValueAction, OnFirstErrorAction);
+
+        // Assert
+        (await action.Should().NotThrowAsync()).Subject.Should().Be("Nice");
+    }
+
+    [Fact]
+    public async Task CallingMatchAsyncAfterThenAsync_WhenIsSuccess_ShouldExecuteOnValueAction()
+    {
+        // Arrange
+        ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
+        Task<string> OnValueAction(Person _) => throw new Exception("Should not be called");
+
+        Task<string> OnErrorsAction(IReadOnlyList<Error> errors)
+        {
+            errors.Should().BeEquivalentTo(errorOrPerson.Errors);
+            return Task.FromResult("Nice");
+        }
+
+        // Act
+        var action = () => errorOrPerson
+            .ThenAsync(person => Task.FromResult(person))
+            .MatchAsync(OnValueAction, OnErrorsAction);
 
         // Assert
         (await action.Should().NotThrowAsync()).Subject.Should().Be("Nice");

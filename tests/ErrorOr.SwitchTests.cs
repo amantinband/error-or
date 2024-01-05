@@ -8,7 +8,7 @@ public class SwitchTests
     private record Person(string Name);
 
     [Fact]
-    public void SwitchErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
+    public void CallingSwitch_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -25,7 +25,7 @@ public class SwitchTests
     }
 
     [Fact]
-    public void SwitchErrorOr_WhenIsError_ShouldExecuteOnErrorAction()
+    public void CallingSwitch_WhenIsError_ShouldExecuteOnErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
@@ -42,7 +42,7 @@ public class SwitchTests
     }
 
     [Fact]
-    public void SwitchFirstErrorOr_WhenIsSuccess_ShouldExecuteOnValueAction()
+    public void CallingSwitchFirst_WhenIsSuccess_ShouldExecuteOnValueAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
@@ -59,7 +59,7 @@ public class SwitchTests
     }
 
     [Fact]
-    public void SwitchFirstErrorOr_WhenIsError_ShouldExecuteOnFirstErrorAction()
+    public void CallingSwitchFirst_WhenIsError_ShouldExecuteOnFirstErrorAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
@@ -75,5 +75,39 @@ public class SwitchTests
 
         // Assert
         action.Should().NotThrow();
+    }
+
+    [Fact]
+    public async Task CallingSwitchFirstAfterThenAsync_WhenIsSuccess_ShouldExecuteOnValueAction()
+    {
+        // Arrange
+        ErrorOr<Person> errorOrPerson = new Person("Amichai");
+        void OnValueAction(Person person) => person.Should().BeEquivalentTo(errorOrPerson.Value);
+        void OnFirstErrorAction(Error _) => throw new Exception("Should not be called");
+
+        // Act
+        var action = () => errorOrPerson
+            .ThenAsync(person => Task.FromResult(person))
+            .SwitchFirst(OnValueAction, OnFirstErrorAction);
+
+        // Assert
+        await action.Should().NotThrowAsync();
+    }
+
+    [Fact]
+    public async Task CallingSwitchAfterThenAsync_WhenIsSuccess_ShouldExecuteOnValueAction()
+    {
+        // Arrange
+        ErrorOr<Person> errorOrPerson = new Person("Amichai");
+        void OnValueAction(Person person) => person.Should().BeEquivalentTo(errorOrPerson.Value);
+        void OnErrorsAction(IReadOnlyList<Error> _) => throw new Exception("Should not be called");
+
+        // Act
+        var action = () => errorOrPerson
+            .ThenAsync(person => Task.FromResult(person))
+            .Switch(OnValueAction, OnErrorsAction);
+
+        // Assert
+        await action.Should().NotThrowAsync();
     }
 }

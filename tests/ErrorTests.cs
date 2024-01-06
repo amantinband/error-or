@@ -17,7 +17,7 @@ public class ErrorTests
     public void CreateError_WhenFailureError_ShouldHaveErrorTypeFailure()
     {
         // Act
-        var error = Error.Failure(ErrorCode, ErrorDescription, Dictionary);
+        Error error = Error.Failure(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.Failure);
@@ -27,7 +27,7 @@ public class ErrorTests
     public void CreateError_WhenUnexpectedError_ShouldHaveErrorTypeFailure()
     {
         // Act
-        var error = Error.Unexpected(ErrorCode, ErrorDescription, Dictionary);
+        Error error = Error.Unexpected(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.Unexpected);
@@ -37,7 +37,7 @@ public class ErrorTests
     public void CreateError_WhenValidationError_ShouldHaveErrorTypeValidation()
     {
         // Act
-        var error = Error.Validation(ErrorCode, ErrorDescription, Dictionary);
+        Error error = Error.Validation(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.Validation);
@@ -47,7 +47,7 @@ public class ErrorTests
     public void CreateError_WhenConflictError_ShouldHaveErrorTypeConflict()
     {
         // Act
-        var error = Error.Conflict(ErrorCode, ErrorDescription, Dictionary);
+        Error error = Error.Conflict(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.Conflict);
@@ -57,7 +57,7 @@ public class ErrorTests
     public void CreateError_WhenNotFoundError_ShouldHaveErrorTypeNotFound()
     {
         // Act
-        var error = Error.NotFound(ErrorCode, ErrorDescription, Dictionary);
+        Error error = Error.NotFound(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.NotFound);
@@ -67,7 +67,7 @@ public class ErrorTests
     public void CreateError_WhenNotAuthorizedError_ShouldHaveErrorTypeUnauthorized()
     {
         // Act
-        var error = Error.Unauthorized(ErrorCode, ErrorDescription, Dictionary);
+        Error error = Error.Unauthorized(ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: ErrorType.Unauthorized);
@@ -77,7 +77,7 @@ public class ErrorTests
     public void CreateError_WhenCustomType_ShouldHaveCustomErrorType()
     {
         // Act
-        var error = Error.Custom(1232, ErrorCode, ErrorDescription, Dictionary);
+        Error error = Error.Custom(1232, ErrorCode, ErrorDescription, Dictionary);
 
         // Assert
         ValidateError(error, expectedErrorType: (ErrorType)1232);

@@ -21,7 +21,7 @@ public class MatchAsyncTests
         Task<string> OnErrorsAction(IReadOnlyList<Error> _) => throw new Exception("Should not be called");
 
         // Act
-        var action = async () => await errorOrPerson.MatchAsync(
+        Func<Task<string>> action = async () => await errorOrPerson.MatchAsync(
             OnValueAction,
             OnErrorsAction);
 
@@ -43,7 +43,7 @@ public class MatchAsyncTests
         }
 
         // Act
-        var action = async () => await errorOrPerson.MatchAsync(
+        Func<Task<string>> action = async () => await errorOrPerson.MatchAsync(
             OnValueAction,
             OnErrorsAction);
 
@@ -65,7 +65,7 @@ public class MatchAsyncTests
         Task<string> OnFirstErrorAction(Error _) => throw new Exception("Should not be called");
 
         // Act
-        var action = async () => await errorOrPerson.MatchFirstAsync(
+        Func<Task<string>> action = async () => await errorOrPerson.MatchFirstAsync(
             OnValueAction,
             OnFirstErrorAction);
 
@@ -88,7 +88,7 @@ public class MatchAsyncTests
         }
 
         // Act
-        var action = async () => await errorOrPerson.MatchFirstAsync(
+        Func<Task<string>> action = async () => await errorOrPerson.MatchFirstAsync(
             OnValueAction,
             OnFirstErrorAction);
 
@@ -111,7 +111,7 @@ public class MatchAsyncTests
         }
 
         // Act
-        var action = () => errorOrPerson
+        Func<Task<string>> action = () => errorOrPerson
             .ThenAsync(person => Task.FromResult(person))
             .MatchFirstAsync(OnValueAction, OnFirstErrorAction);
 
@@ -133,7 +133,7 @@ public class MatchAsyncTests
         }
 
         // Act
-        var action = () => errorOrPerson
+        Func<Task<string>> action = () => errorOrPerson
             .ThenAsync(person => Task.FromResult(person))
             .MatchAsync(OnValueAction, OnErrorsAction);
 

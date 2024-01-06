@@ -91,6 +91,23 @@ public class ElseTests
     }
 
     [Fact]
+    public void CallingElseWithError_WhenIsSuccess_ShouldNotReturnElseError()
+    {
+        // Arrange
+        ErrorOr<string> errorOrString = "5";
+
+        // Act
+        ErrorOr<string> result = errorOrString
+            .Then(str => ConvertToInt(str))
+            .Then(num => ConvertToString(num))
+            .Else(Error.Unexpected());
+
+        // Assert
+        result.IsError.Should().BeFalse();
+        result.Value.Should().Be(errorOrString.Value);
+    }
+
+    [Fact]
     public void CallingElseWithErrorsFunc_WhenIsError_ShouldReturnElseError()
     {
         // Arrange
@@ -108,6 +125,23 @@ public class ElseTests
     }
 
     [Fact]
+    public void CallingElseWithErrorsFunc_WhenIsSuccess_ShouldNotReturnElseError()
+    {
+        // Arrange
+        ErrorOr<string> errorOrString = "5";
+
+        // Act
+        ErrorOr<string> result = errorOrString
+            .Then(str => ConvertToInt(str))
+            .Then(num => ConvertToString(num))
+            .Else(errors => Error.Unexpected());
+
+        // Assert
+        result.IsError.Should().BeFalse();
+        result.Value.Should().Be(errorOrString.Value);
+    }
+
+    [Fact]
     public void CallingElseWithErrorsFunc_WhenIsError_ShouldReturnElseErrors()
     {
         // Arrange
@@ -122,6 +156,23 @@ public class ElseTests
         // Assert
         result.IsError.Should().BeTrue();
         result.FirstError.Type.Should().Be(ErrorType.Unexpected);
+    }
+
+    [Fact]
+    public void CallingElseWithErrorsFunc_WhenIsSuccess_ShouldNotReturnElseErrors()
+    {
+        // Arrange
+        ErrorOr<string> errorOrString = "5";
+
+        // Act
+        ErrorOr<string> result = errorOrString
+            .Then(str => ConvertToInt(str))
+            .Then(num => ConvertToString(num))
+            .Else(errors => new() { Error.Unexpected() });
+
+        // Assert
+        result.IsError.Should().BeFalse();
+        result.Value.Should().Be(errorOrString.Value);
     }
 
     [Fact]

@@ -15,26 +15,4 @@ public static class ErrorOrFactory
     {
         return value;
     }
-
-    /// <summary>
-    /// Creates a new instance of <see cref="ErrorOr{TValue}"/> with a value.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="value">The value to wrap.</param>
-    /// <returns>An instance of <see cref="ErrorOr{TValue}"/> containing the provided value.</returns>
-    public static ErrorOr<TValue> From<TValue>(Error value)
-    {
-        return value;
-    }
-
-    /// <summary>
-    /// Creates a new instance of <see cref="ErrorOr{TValue}"/> with a value.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="value">The value to wrap.</param>
-    /// <returns>An instance of <see cref="ErrorOr{TValue}"/> containing the provided value.</returns>
-    public static ErrorOr<TValue> From<TValue>(List<Error> value)
-    {
-        return value;
-    }
 }

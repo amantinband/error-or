@@ -9,10 +9,10 @@ public class ToErrorOrTests
     public void ValueToErrorOr_WhenAccessingValue_ShouldReturnValue()
     {
         // Arrange
-        var value = 5;
+        int value = 5;
 
         // Act
-        var result = value.ToErrorOr();
+        ErrorOr<int> result = value.ToErrorOr();
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -23,10 +23,10 @@ public class ToErrorOrTests
     public void ErrorToErrorOr_WhenAccessingFirstError_ShouldReturnSameError()
     {
         // Arrange
-        var error = Error.Unauthorized();
+        Error error = Error.Unauthorized();
 
         // Act
-        var result = error.ToErrorOr<int>();
+        ErrorOr<int> result = error.ToErrorOr<int>();
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -37,10 +37,10 @@ public class ToErrorOrTests
     public void ListOfErrorsToErrorOr_WhenAccessingErrors_ShouldReturnSameErrors()
     {
         // Arrange
-        var errors = new List<Error> { Error.Unauthorized(), Error.Validation() };
+        List<Error> errors = new List<Error> { Error.Unauthorized(), Error.Validation() };
 
         // Act
-        var result = errors.ToErrorOr<int>();
+        ErrorOr<int> result = errors.ToErrorOr<int>();
 
         // Assert
         result.IsError.Should().BeTrue();

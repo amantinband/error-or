@@ -14,7 +14,7 @@ public class ErrorOrTests
         IEnumerable<string> value = new[] { "value" };
 
         // Act
-        var errorOrPerson = ErrorOrFactory.From(value);
+        ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Assert
         errorOrPerson.IsError.Should().BeFalse();
@@ -26,10 +26,10 @@ public class ErrorOrTests
     {
         // Arrange
         IEnumerable<string> value = new[] { "value" };
-        var errorOrPerson = ErrorOrFactory.From(value);
+        ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
-        var errors = errorOrPerson.Errors;
+        List<Error> errors = errorOrPerson.Errors;
 
         // Assert
         errors.Should().ContainSingle().Which.Type.Should().Be(ErrorType.Unexpected);
@@ -40,10 +40,10 @@ public class ErrorOrTests
     {
         // Arrange
         IEnumerable<string> value = new[] { "value" };
-        var errorOrPerson = ErrorOrFactory.From(value);
+        ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
-        var errors = errorOrPerson.ErrorsOrEmptyList;
+        List<Error> errors = errorOrPerson.ErrorsOrEmptyList;
 
         // Assert
         errors.Should().BeEmpty();
@@ -54,10 +54,10 @@ public class ErrorOrTests
     {
         // Arrange
         IEnumerable<string> value = new[] { "value" };
-        var errorOrPerson = ErrorOrFactory.From(value);
+        ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
-        var firstError = errorOrPerson.FirstError;
+        Error firstError = errorOrPerson.FirstError;
 
         // Assert
         firstError.Type.Should().Be(ErrorType.Unexpected);
@@ -70,7 +70,7 @@ public class ErrorOrTests
         IEnumerable<string> value = new[] { "value" };
 
         // Act
-        var errorOrPerson = ErrorOrFactory.From(value);
+        ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Assert
         errorOrPerson.IsError.Should().BeFalse();
@@ -82,10 +82,10 @@ public class ErrorOrTests
     {
         // Arrange
         IEnumerable<string> value = new[] { "value" };
-        var errorOrPerson = ErrorOrFactory.From(value);
+        ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
-        var errors = errorOrPerson.Errors;
+        List<Error> errors = errorOrPerson.Errors;
 
         // Assert
         errors.Should().ContainSingle().Which.Type.Should().Be(ErrorType.Unexpected);
@@ -96,10 +96,10 @@ public class ErrorOrTests
     {
         // Arrange
         IEnumerable<string> value = new[] { "value" };
-        var errorOrPerson = ErrorOrFactory.From(value);
+        ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
-        var errors = errorOrPerson.ErrorsOrEmptyList;
+        List<Error> errors = errorOrPerson.ErrorsOrEmptyList;
 
         // Assert
         errors.Should().BeEmpty();
@@ -110,10 +110,10 @@ public class ErrorOrTests
     {
         // Arrange
         IEnumerable<string> value = new[] { "value" };
-        var errorOrPerson = ErrorOrFactory.From(value);
+        ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
-        var firstError = errorOrPerson.FirstError;
+        Error firstError = errorOrPerson.FirstError;
 
         // Assert
         firstError.Type.Should().Be(ErrorType.Unexpected);
@@ -123,8 +123,8 @@ public class ErrorOrTests
     public void CreateFromErrorList_WhenAccessingErrors_ShouldReturnErrorList()
     {
         // Arrange
-        var errors = new List<Error> { Error.Validation("User.Name", "Name is too short") };
-        var errorOrPerson = ErrorOr<Person>.From(errors);
+        List<Error> errors = new() { Error.Validation("User.Name", "Name is too short") };
+        ErrorOr<Person> errorOrPerson = ErrorOr<Person>.From(errors);
 
         // Act & Assert
         errorOrPerson.IsError.Should().BeTrue();
@@ -135,8 +135,8 @@ public class ErrorOrTests
     public void CreateFromErrorList_WhenAccessingErrorsOrEmptyList_ShouldReturnErrorList()
     {
         // Arrange
-        var errors = new List<Error> { Error.Validation("User.Name", "Name is too short") };
-        var errorOrPerson = ErrorOr<Person>.From(errors);
+        List<Error> errors = new() { Error.Validation("User.Name", "Name is too short") };
+        ErrorOr<Person> errorOrPerson = ErrorOr<Person>.From(errors);
 
         // Act & Assert
         errorOrPerson.IsError.Should().BeTrue();
@@ -147,11 +147,11 @@ public class ErrorOrTests
     public void CreateFromErrorList_WhenAccessingValue_ShouldReturnDefault()
     {
         // Arrange
-        var errors = new List<Error> { Error.Validation("User.Name", "Name is too short") };
-        var errorOrPerson = ErrorOr<Person>.From(errors);
+        List<Error> errors = new() { Error.Validation("User.Name", "Name is too short") };
+        ErrorOr<Person> errorOrPerson = ErrorOr<Person>.From(errors);
 
         // Act
-        var value = errorOrPerson.Value;
+        Person value = errorOrPerson.Value;
 
         // Assert
         value.Should().Be(default);
@@ -161,7 +161,7 @@ public class ErrorOrTests
     public void ImplicitCastResult_WhenAccessingResult_ShouldReturnValue()
     {
         // Arrange
-        var result = new Person("Amichai");
+        Person result = new Person("Amici");
 
         // Act
         ErrorOr<Person> errorOr = result;
@@ -177,7 +177,7 @@ public class ErrorOrTests
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
 
         // Act
-        var errors = errorOrPerson.Errors;
+        List<Error> errors = errorOrPerson.Errors;
 
         // Assert
         errors.Should().ContainSingle().Which.Type.Should().Be(ErrorType.Unexpected);
@@ -189,7 +189,7 @@ public class ErrorOrTests
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
 
         // Act
-        var firstError = errorOrPerson.FirstError;
+        Error firstError = errorOrPerson.FirstError;
 
         // Assert
         firstError.Type.Should().Be(ErrorType.Unexpected);
@@ -236,7 +236,7 @@ public class ErrorOrTests
     public void ImplicitCastSingleError_WhenAccessingErrors_ShouldReturnErrorList()
     {
         // Arrange
-        var error = Error.Validation("User.Name", "Name is too short");
+        Error error = Error.Validation("User.Name", "Name is too short");
 
         // Act
         ErrorOr<Person> errorOrPerson = error;
@@ -253,7 +253,7 @@ public class ErrorOrTests
         ErrorOr<Person> errorOrPerson = Error.Validation("User.Name", "Name is too short");
 
         // Act
-        var value = errorOrPerson.Value;
+        Person value = errorOrPerson.Value;
 
         // Assert
         value.Should().Be(default);
@@ -263,7 +263,7 @@ public class ErrorOrTests
     public void ImplicitCastSingleError_WhenAccessingFirstError_ShouldReturnError()
     {
         // Arrange
-        var error = Error.Validation("User.Name", "Name is too short");
+        Error error = Error.Validation("User.Name", "Name is too short");
 
         // Act
         ErrorOr<Person> errorOrPerson = error;
@@ -277,7 +277,7 @@ public class ErrorOrTests
     public void ImplicitCastErrorList_WhenAccessingErrors_ShouldReturnErrorList()
     {
         // Arrange
-        var errors = new List<Error>
+        List<Error> errors = new()
         {
             Error.Validation("User.Name", "Name is too short"),
             Error.Validation("User.Age", "User is too young"),
@@ -295,7 +295,7 @@ public class ErrorOrTests
     public void ImplicitCastErrorArray_WhenAccessingErrors_ShouldReturnErrorArray()
     {
         // Arrange
-        var errors = new[]
+        Error[] errors = new[]
         {
             Error.Validation("User.Name", "Name is too short"),
             Error.Validation("User.Age", "User is too young"),
@@ -313,7 +313,7 @@ public class ErrorOrTests
     public void ImplicitCastErrorList_WhenAccessingFirstError_ShouldReturnFirstError()
     {
         // Arrange
-        var errors = new List<Error>
+        List<Error> errors = new()
         {
             Error.Validation("User.Name", "Name is too short"),
             Error.Validation("User.Age", "User is too young"),
@@ -331,7 +331,7 @@ public class ErrorOrTests
     public void ImplicitCastErrorArray_WhenAccessingFirstError_ShouldReturnFirstError()
     {
         // Arrange
-        var errors = new[]
+        Error[] errors = new[]
         {
             Error.Validation("User.Name", "Name is too short"),
             Error.Validation("User.Age", "User is too young"),

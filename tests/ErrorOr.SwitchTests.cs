@@ -16,7 +16,7 @@ public class SwitchTests
         void OnErrorsAction(IReadOnlyList<Error> _) => throw new Exception("Should not be called");
 
         // Act
-        var action = () => errorOrPerson.Switch(
+        Action action = () => errorOrPerson.Switch(
             OnValueAction,
             OnErrorsAction);
 
@@ -33,7 +33,7 @@ public class SwitchTests
         void OnErrorsAction(IReadOnlyList<Error> errors) => errors.Should().BeEquivalentTo(errorOrPerson.Errors);
 
         // Act
-        var action = () => errorOrPerson.Switch(
+        Action action = () => errorOrPerson.Switch(
             OnValueAction,
             OnErrorsAction);
 
@@ -50,7 +50,7 @@ public class SwitchTests
         void OnFirstErrorAction(Error _) => throw new Exception("Should not be called");
 
         // Act
-        var action = () => errorOrPerson.SwitchFirst(
+        Action action = () => errorOrPerson.SwitchFirst(
             OnValueAction,
             OnFirstErrorAction);
 
@@ -69,7 +69,7 @@ public class SwitchTests
                 .And.BeEquivalentTo(errorOrPerson.FirstError);
 
         // Act
-        var action = () => errorOrPerson.SwitchFirst(
+        Action action = () => errorOrPerson.SwitchFirst(
             OnValueAction,
             OnFirstErrorAction);
 
@@ -86,7 +86,7 @@ public class SwitchTests
         void OnFirstErrorAction(Error _) => throw new Exception("Should not be called");
 
         // Act
-        var action = () => errorOrPerson
+        Func<Task> action = () => errorOrPerson
             .ThenAsync(person => Task.FromResult(person))
             .SwitchFirst(OnValueAction, OnFirstErrorAction);
 
@@ -103,7 +103,7 @@ public class SwitchTests
         void OnErrorsAction(IReadOnlyList<Error> _) => throw new Exception("Should not be called");
 
         // Act
-        var action = () => errorOrPerson
+        Func<Task> action = () => errorOrPerson
             .ThenAsync(person => Task.FromResult(person))
             .Switch(OnValueAction, OnErrorsAction);
 

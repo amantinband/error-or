@@ -16,7 +16,7 @@ public class SwitchAsyncTests
         Task OnErrorsAction(IReadOnlyList<Error> _) => throw new Exception("Should not be called");
 
         // Act
-        var action = async () => await errorOrPerson.SwitchAsync(
+        Func<Task> action = async () => await errorOrPerson.SwitchAsync(
             OnValueAction,
             OnErrorsAction);
 
@@ -33,7 +33,7 @@ public class SwitchAsyncTests
         Task OnErrorsAction(IReadOnlyList<Error> errors) => Task.FromResult(errors.Should().BeEquivalentTo(errorOrPerson.Errors));
 
         // Act
-        var action = async () => await errorOrPerson.SwitchAsync(
+        Func<Task> action = async () => await errorOrPerson.SwitchAsync(
             OnValueAction,
             OnErrorsAction);
 
@@ -50,7 +50,7 @@ public class SwitchAsyncTests
         Task OnFirstErrorAction(Error _) => throw new Exception("Should not be called");
 
         // Act
-        var action = async () => await errorOrPerson.SwitchFirstAsync(
+        Func<Task> action = async () => await errorOrPerson.SwitchFirstAsync(
             OnValueAction,
             OnFirstErrorAction);
 
@@ -69,7 +69,7 @@ public class SwitchAsyncTests
                 .And.BeEquivalentTo(errorOrPerson.FirstError));
 
         // Act
-        var action = async () => await errorOrPerson.SwitchFirstAsync(
+        Func<Task> action = async () => await errorOrPerson.SwitchFirstAsync(
             OnValueAction,
             OnFirstErrorAction);
 
@@ -86,7 +86,7 @@ public class SwitchAsyncTests
         Task OnFirstErrorAction(Error _) => throw new Exception("Should not be called");
 
         // Act
-        var action = async () => await errorOrPerson
+        Func<Task> action = async () => await errorOrPerson
             .ThenAsync(person => Task.FromResult(person))
             .SwitchFirstAsync(
                 OnValueAction,
@@ -105,7 +105,7 @@ public class SwitchAsyncTests
         Task OnErrorsAction(IReadOnlyList<Error> _) => throw new Exception("Should not be called");
 
         // Act
-        var action = async () => await errorOrPerson
+        Func<Task> action = async () => await errorOrPerson
             .ThenAsync(person => Task.FromResult(person))
             .SwitchAsync(OnValueAction, OnErrorsAction);
 

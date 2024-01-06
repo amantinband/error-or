@@ -65,7 +65,7 @@ public class MatchTests
         string OnFirstErrorAction(Error _) => throw new Exception("Should not be called");
 
         // Act
-        var action = () => errorOrPerson.MatchFirst(
+        Func<string> action = () => errorOrPerson.MatchFirst(
             OnValueAction,
             OnFirstErrorAction);
 
@@ -88,7 +88,7 @@ public class MatchTests
         }
 
         // Act
-        var action = () => errorOrPerson.MatchFirst(
+        Func<string> action = () => errorOrPerson.MatchFirst(
             OnValueAction,
             OnFirstErrorAction);
 
@@ -110,7 +110,7 @@ public class MatchTests
         string OnFirstErrorAction(Error _) => throw new Exception("Should not be called");
 
         // Act
-        var action = () => errorOrPerson
+        Func<Task<string>> action = () => errorOrPerson
             .ThenAsync(person => Task.FromResult(person))
             .MatchFirst(OnValueAction, OnFirstErrorAction);
 
@@ -132,7 +132,7 @@ public class MatchTests
         string OnErrorsAction(IReadOnlyList<Error> _) => throw new Exception("Should not be called");
 
         // Act
-        var action = () => errorOrPerson
+        Func<Task<string>> action = () => errorOrPerson
             .ThenAsync(person => Task.FromResult(person))
             .Match(OnValueAction, OnErrorsAction);
 

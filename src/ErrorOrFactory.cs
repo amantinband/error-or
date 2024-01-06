@@ -5,7 +5,7 @@ namespace ErrorOr;
 /// </summary>
 public static class ErrorOrFactory
 {
-     /// <summary>
+    /// <summary>
     /// Creates a new instance of <see cref="ErrorOr{TValue}"/> with a value.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>

@@ -244,7 +244,7 @@ ErrorOr<int> result = new[] { Error.Validation(), Error.Validation() }.ToErrorOr
 ## `IsError`
 
 ```cs
-ErrorOr<int> foo = User.Create();
+ErrorOr<int> result = User.Create();
 
 if (result.IsError)
 {
@@ -255,7 +255,7 @@ if (result.IsError)
 ## `Value`
 
 ```cs
-ErrorOr<int> foo = User.Create();
+ErrorOr<int> result = User.Create();
 
 if (!result.IsError) // the result contains a value
 {
@@ -266,7 +266,7 @@ if (!result.IsError) // the result contains a value
 ## `Errors`
 
 ```cs
-ErrorOr<int> foo = User.Create();
+ErrorOr<int> result = User.Create();
 
 if (result.IsError)
 {
@@ -278,7 +278,7 @@ if (result.IsError)
 ## `FirstError`
 
 ```cs
-ErrorOr<int> foo = User.Create();
+ErrorOr<int> result = User.Create();
 
 if (result.IsError)
 {
@@ -290,7 +290,7 @@ if (result.IsError)
 ## `ErrorsOrEmptyList`
 
 ```cs
-ErrorOr<int> foo = User.Create();
+ErrorOr<int> result = User.Create();
 
 if (result.IsError)
 {

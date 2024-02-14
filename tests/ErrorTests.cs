@@ -74,6 +74,16 @@ public class ErrorTests
     }
 
     [Fact]
+    public void CreateError_WhenForbiddenError_ShouldHaveErrorTypeForbidden()
+    {
+        // Act
+        Error error = Error.Forbidden(ErrorCode, ErrorDescription, Dictionary);
+
+        // Assert
+        ValidateError(error, expectedErrorType: ErrorType.Forbidden);
+    }
+
+    [Fact]
     public void CreateError_WhenCustomType_ShouldHaveCustomErrorType()
     {
         // Act

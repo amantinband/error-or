@@ -19,12 +19,12 @@
 - [Give it a star ⭐!](#give-it-a-star-)
 - [Getting Started 🏃](#getting-started-)
   - [Replace throwing exceptions with `ErrorOr<T>`](#replace-throwing-exceptions-with-errorort)
+  - [Support For Multiple Errors](#support-for-multiple-errors)
   - [Various Functional Methods and Extension Methods](#various-functional-methods-and-extension-methods)
     - [Real world example](#real-world-example)
     - [Simple Example with intermediate steps](#simple-example-with-intermediate-steps)
       - [No Failure](#no-failure)
       - [Failure](#failure)
-  - [Support For Multiple Errors](#support-for-multiple-errors)
 - [Creating an `ErrorOr` instance](#creating-an-erroror-instance)
   - [Using implicit conversion](#using-implicit-conversion)
   - [Using The `ErrorOrFactory`](#using-the-errororfactory)
@@ -134,7 +134,47 @@ Divide(4, 2)
         onFirstError: error => Console.WriteLine(error.Description));
 ```
 
+## Support For Multiple Errors
+
+Internally, the `ErrorOr` object has a list of `Error`s, so if you have multiple errors, you don't need to compromise and have only the first one.
+
+```cs
+public class User(string _name)
+{
+    public static ErrorOr<User> Create(string name)
+    {
+        List<Error> errors = [];
+
+        if (name.Length < 2)
+        {
+            errors.Add(Error.Validation(description: "Name is too short"));
+        }
+
+        if (name.Length > 100)
+        {
+            errors.Add(Error.Validation(description: "Name is too long"));
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            errors.Add(Error.Validation(description: "Name cannot be empty or whitespace only"));
+        }
+
+        if (errors.Count > 0)
+        {
+            return errors;
+        }
+
+        return new User(name);
+    }
+}
+```
+
 ## Various Functional Methods and Extension Methods
+
+The `ErrorOr` object has a variety of methods that allow you to work with it in a functional way.
+
+This allows you to chain methods together, and handle the result in a clean and concise way.
 
 ### Real world example
 
@@ -185,41 +225,6 @@ ErrorOr<string> foo = await "5".ToErrorOr()
         firstError => $"An error occurred: {firstError.Description}"); // An error occurred: 5 is too big
 ```
 
-## Support For Multiple Errors
-
-Internally, the `ErrorOr` object has a list of `Error`s, so if you have multiple errors, you don't need to compromise and have only the first one.
-
-```cs
-public class User(string _name)
-{
-    public static ErrorOr<User> Create(string name)
-    {
-        List<Error> errors = [];
-
-        if (name.Length < 2)
-        {
-            errors.Add(Error.Validation(description: "Name is too short"));
-        }
-
-        if (name.Length > 100)
-        {
-            errors.Add(Error.Validation(description: "Name is too long"));
-        }
-
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            errors.Add(Error.Validation(description: "Name cannot be empty or whitespace only"));
-        }
-
-        if (errors.Count > 0)
-        {
-            return errors;
-        }
-
-        return new User(name);
-    }
-}
-```
 
 # Creating an `ErrorOr` instance
 

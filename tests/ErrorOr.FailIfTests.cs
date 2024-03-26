@@ -43,7 +43,7 @@ public class FailIfTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .FailIf(str => str == "", Error.Failure());
+            .FailIf(str => str == string.Empty, Error.Failure());
 
         // Assert
         result.IsError.Should().BeTrue();

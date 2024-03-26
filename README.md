@@ -222,7 +222,7 @@ ErrorOr<string> foo = await "5".ToErrorOr()
     .Else(errors => Error.Unexpected(description: "Yikes")) // Error.Unexpected()
     .MatchFirst(
         value => value,
-        firstError => $"An error occurred: {firstError.Description}"); // An error occurred: 5 is too big
+        firstError => $"An error occurred: {firstError.Description}"); // An error occurred: Yikes
 ```
 
 

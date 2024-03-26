@@ -23,7 +23,7 @@ public class ElseTests
     }
 
     [Fact]
-    public void CallingElseWithValueFunc_WhenIsError_ShouldReturnElseValue()
+    public void CallingElseWithValueFunc_WhenIsError_ShouldInvokeElseFunc()
     {
         // Arrange
         ErrorOr<string> errorOrString = Error.NotFound();
@@ -57,7 +57,7 @@ public class ElseTests
     }
 
     [Fact]
-    public void CallingElseWithValue_WhenIsError_ShouldReturnElseValue()
+    public void CallingElseWithValue_WhenIsError_ShouldInvokeElseFunc()
     {
         // Arrange
         ErrorOr<string> errorOrString = Error.NotFound();
@@ -176,7 +176,7 @@ public class ElseTests
     }
 
     [Fact]
-    public async Task CallingElseWithValueAfterThenAsync_WhenIsError_ShouldReturnElseValue()
+    public async Task CallingElseWithValueAfterThenAsync_WhenIsError_ShouldInvokeElseFunc()
     {
         // Arrange
         ErrorOr<string> errorOrString = Error.NotFound();
@@ -193,7 +193,7 @@ public class ElseTests
     }
 
     [Fact]
-    public async Task CallingElseWithValueFuncAfterThenAsync_WhenIsError_ShouldReturnElseValue()
+    public async Task CallingElseWithValueFuncAfterThenAsync_WhenIsError_ShouldInvokeElseFunc()
     {
         // Arrange
         ErrorOr<string> errorOrString = Error.NotFound();

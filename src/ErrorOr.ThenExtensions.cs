@@ -39,11 +39,11 @@ public static partial class ErrorOrExtensions
     /// <param name="errorOr">The <see cref="ErrorOr"/> instance.</param>
     /// <param name="action">The action to execute if the state is a value.</param>
     /// <returns>The original <paramref name="errorOr"/>.</returns>
-    public static async Task<ErrorOr<TValue>> Then<TValue>(this Task<ErrorOr<TValue>> errorOr, Action<TValue> action)
+    public static async Task<ErrorOr<TValue>> ThenDo<TValue>(this Task<ErrorOr<TValue>> errorOr, Action<TValue> action)
     {
         var result = await errorOr.ConfigureAwait(false);
 
-        return result.Then(action);
+        return result.ThenDo(action);
     }
 
     /// <summary>
@@ -83,10 +83,10 @@ public static partial class ErrorOrExtensions
     /// <param name="errorOr">The <see cref="ErrorOr"/> instance.</param>
     /// <param name="action">The action to execute if the state is a value.</param>
     /// <returns>The original <paramref name="errorOr"/>.</returns>
-    public static async Task<ErrorOr<TValue>> ThenAsync<TValue>(this Task<ErrorOr<TValue>> errorOr, Func<TValue, Task> action)
+    public static async Task<ErrorOr<TValue>> ThenDoAsync<TValue>(this Task<ErrorOr<TValue>> errorOr, Func<TValue, Task> action)
     {
         var result = await errorOr.ConfigureAwait(false);
 
-        return await result.ThenAsync(action).ConfigureAwait(false);
+        return await result.ThenDoAsync(action).ConfigureAwait(false);
     }
 }

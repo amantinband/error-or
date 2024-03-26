@@ -19,7 +19,8 @@
 - [Give it a star ⭐!](#give-it-a-star-)
 - [Getting Started 🏃](#getting-started-)
   - [Replace throwing exceptions with `ErrorOr<T>`](#replace-throwing-exceptions-with-errorort)
-  - [Return Multiple Errors When Needed](#return-multiple-errors-when-needed)
+  - [Various Functional Methods and Extension Methods](#various-functional-methods-and-extension-methods)
+  - [Support For Multiple Errors](#support-for-multiple-errors)
 - [Creating an `ErrorOr` instance](#creating-an-erroror-instance)
   - [Using implicit conversion](#using-implicit-conversion)
   - [Using The `ErrorOrFactory`](#using-the-errororfactory)
@@ -127,7 +128,141 @@ Divide(4, 2)
         onFirstError: error => Console.WriteLine(error.Description));
 ```
 
-## Return Multiple Errors When Needed
+## Various Functional Methods and Extension Methods
+
+```cs
+ErrorOr<string> foo = await "2".ToErrorOr()
+    .Then(int.Parse) // 2
+    .When(val => val > 2, Error.Validation(description: $"{val} is too big") // 2
+    .ThenAsync(Task.Delay) // Sleep for 2 milliseconds
+    .Then(val => Console.WriteLine($"Finished waiting {val} milliseconds.")) // Finished waiting 2 milliseconds.
+    .ThenAsync(val => Task.FromResult(val * 2)) // 4
+    .Then(val => $"The result is {val}") // "The result is 4"
+    .Else(errors => Error.Unexpected(description: "Yikes")) // "The result is 4"
+    .MatchFirst(
+        value => value, // "The result is 4"
+        firstError => $"An error occurred: {firstError.Description}");
+```
+
+```cs
+ErrorOr<string> foo = await "5".ToErrorOr()
+    .Then(int.Parse) // 5
+    .When(val => val > 2, Error.Validation(description: $"{val} is too big") // 2
+    .ThenAsync(Task.Delay) // Error.Validation()
+    .Then(val => Console.WriteLine($"Finished waiting {val} milliseconds.")) // Error.Validation()
+    .ThenAsync(val => Task.FromResult(val * 2)) // Error.Validation()
+    .Then(val => $"The result is {val}") // Error.Validation()
+    .Else(errors => Error.Unexpected(description: "Yikes")) // Error.Unexpected()
+    .MatchFirst(
+        value => value,
+        firstError => $"An error occurred: {firstError.Description}"); // An error occurred: Yikes
+```
+
+```cs
+var result = await "-1".ToErrorOr()
+    .Then(int.Parse) // -1
+    .Where(val => val < 2, Error.Validation(description: $"{val} is too big") // -1
+    .Else(Error.Unexpected("Big")))) // -1
+    .Where(val => val > 0, Error.Validation(description: $"{val} is too small")) // Error.Validation()
+    .Else(Error.Unexpected("Small"))); // Error.Unexpected()
+```
+
+
+```cs
+try
+{
+    var user = await _userRepository.GetByIdAsync(id) // throws an exception if something goes wrong
+        ?? throw new NotFoundException("User not found");
+
+    user.IncrementAge(); // throws UserTooOldException if age is over 130, but may also throw other exceptions
+    if (!user.IsOverAge(18)) throw new ValidationException("User is under age");
+
+    await _userRepository.UpdateAsync(incrementAgeResult.Value); // throws an exception if something goes wrong
+
+    return NoContent();
+}
+catch (Exception e)
+{
+    return e switch
+    {
+        NotFoundException => ..,
+        ValidationException => ..,
+        UserTooOldException => ..,
+        _ => InternalServerError(),
+    };
+}
+```
+
+```cs
+ErrorOr<User> user = await _userRepository.GetByIdAsync(id);
+if (user.IsError)
+{
+    return user.Errors.ToActionResult();
+}
+
+var incrementAgeResult = user.Value.IncrementAge();
+if (incrementAgeResult.IsError)
+{
+    return incrementAgeResult.Errors.ToActionResult();
+}
+
+if (!incrementAgeResult.Value.IsOverAge(18))
+{
+    return UserErrors.UnderAge.ToActionResult();
+}
+
+var updateUserResult = await _userRepository.UpdateAsync(incrementAgeResult.Value);
+if (updateUserResult.IsError)
+{
+    return updateUserResult.Errors.ToActionResult();
+}
+
+return NoContent();
+```
+
+```cs
+return await _userRepository.GetByIdAsync(id)
+    .Then(user => user.IncrementAge()
+        .Then(success => user)
+        .Else(errors => Error.Unexpected("Not expected to fail")))
+    .When(user => !user.IsOverAge(18), UserErrors.UnderAge)
+    .ThenDo(user => _logger.LogInformation($"User {user.Id} incremented age to {user.Age}"))
+    .ThenAsync(user => _userRepository.UpdateAsync(user))
+    .Finally(
+        _ => NoContent(),
+        errors => errors.ToActionResult());
+```
+
+```cs
+return await _userRepository.GetByIdAsync(id)
+    .Then(user => user.IncrementAge().Then(success => user))
+    .When(user => !user.IsOverAge(18), UserErrors.UnderAge)
+    .ThenDo(user => _logger.LogInformation($"User {user.Id} incremented age to {user.Age}"))
+    .ThenAsync(user => _userRepository.UpdateAsync(user))
+    .Match(
+        _ => NoContent(),
+        errors => errors.ToActionResult());
+```
+
+```cs
+var hiResult = user.SayHi();
+
+if (hiResult.IsError)
+{
+    return Error.Validation("bad hi");
+}
+
+var byeResult = user.SayBye();
+
+if (byeResult.IsError)
+{
+    return Error.Validation("bad bye");
+}
+
+return Result.Success
+```
+
+## Support For Multiple Errors
 
 Internally, the `ErrorOr` object has a list of `Error`s, so if you have multiple errors, you don't need to compromise and have only the first one.
 

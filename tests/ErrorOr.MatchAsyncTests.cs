@@ -8,35 +8,35 @@ public class MatchAsyncTests
     private record Person(string Name);
 
     [Fact]
-    public async Task CallingMatchAsync_WhenIsSuccess_ShouldExecuteOnValueAction()
+    public async Task CallingMatchAsync_WhenIsSuccess_ShouldExecuteThenAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
-        Task<string> OnValueAction(Person person)
+        Task<string> ThenAction(Person person)
         {
             person.Should().BeEquivalentTo(errorOrPerson.Value);
             return Task.FromResult("Nice");
         }
 
-        Task<string> OnErrorsAction(IReadOnlyList<Error> _) => throw new Exception("Should not be called");
+        Task<string> ElsesAction(IReadOnlyList<Error> _) => throw new Exception("Should not be called");
 
         // Act
         Func<Task<string>> action = async () => await errorOrPerson.MatchAsync(
-            OnValueAction,
-            OnErrorsAction);
+            ThenAction,
+            ElsesAction);
 
         // Assert
         (await action.Should().NotThrowAsync()).Subject.Should().Be("Nice");
     }
 
     [Fact]
-    public async Task CallingMatchAsync_WhenIsError_ShouldExecuteOnErrorAction()
+    public async Task CallingMatchAsync_WhenIsError_ShouldExecuteElseAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
-        Task<string> OnValueAction(Person _) => throw new Exception("Should not be called");
+        Task<string> ThenAction(Person _) => throw new Exception("Should not be called");
 
-        Task<string> OnErrorsAction(IReadOnlyList<Error> errors)
+        Task<string> ElsesAction(IReadOnlyList<Error> errors)
         {
             errors.Should().BeEquivalentTo(errorOrPerson.Errors);
             return Task.FromResult("Nice");
@@ -44,19 +44,19 @@ public class MatchAsyncTests
 
         // Act
         Func<Task<string>> action = async () => await errorOrPerson.MatchAsync(
-            OnValueAction,
-            OnErrorsAction);
+            ThenAction,
+            ElsesAction);
 
         // Assert
         (await action.Should().NotThrowAsync()).Subject.Should().Be("Nice");
     }
 
     [Fact]
-    public async Task CallingMatchFirstAsync_WhenIsSuccess_ShouldExecuteOnValueAction()
+    public async Task CallingMatchFirstAsync_WhenIsSuccess_ShouldExecuteThenAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
-        Task<string> OnValueAction(Person person)
+        Task<string> ThenAction(Person person)
         {
             person.Should().BeEquivalentTo(errorOrPerson.Value);
             return Task.FromResult("Nice");
@@ -66,7 +66,7 @@ public class MatchAsyncTests
 
         // Act
         Func<Task<string>> action = async () => await errorOrPerson.MatchFirstAsync(
-            OnValueAction,
+            ThenAction,
             OnFirstErrorAction);
 
         // Assert
@@ -78,7 +78,7 @@ public class MatchAsyncTests
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
-        Task<string> OnValueAction(Person _) => throw new Exception("Should not be called");
+        Task<string> ThenAction(Person _) => throw new Exception("Should not be called");
         Task<string> OnFirstErrorAction(Error errors)
         {
             errors.Should().BeEquivalentTo(errorOrPerson.Errors[0])
@@ -89,7 +89,7 @@ public class MatchAsyncTests
 
         // Act
         Func<Task<string>> action = async () => await errorOrPerson.MatchFirstAsync(
-            OnValueAction,
+            ThenAction,
             OnFirstErrorAction);
 
         // Assert
@@ -97,11 +97,11 @@ public class MatchAsyncTests
     }
 
     [Fact]
-    public async Task CallingMatchFirstAsyncAfterThenAsync_WhenIsSuccess_ShouldExecuteOnValueAction()
+    public async Task CallingMatchFirstAsyncAfterThenAsync_WhenIsSuccess_ShouldExecuteThenAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
-        Task<string> OnValueAction(Person _) => throw new Exception("Should not be called");
+        Task<string> ThenAction(Person _) => throw new Exception("Should not be called");
         Task<string> OnFirstErrorAction(Error errors)
         {
             errors.Should().BeEquivalentTo(errorOrPerson.Errors[0])
@@ -113,20 +113,20 @@ public class MatchAsyncTests
         // Act
         Func<Task<string>> action = () => errorOrPerson
             .ThenAsync(person => Task.FromResult(person))
-            .MatchFirstAsync(OnValueAction, OnFirstErrorAction);
+            .MatchFirstAsync(ThenAction, OnFirstErrorAction);
 
         // Assert
         (await action.Should().NotThrowAsync()).Subject.Should().Be("Nice");
     }
 
     [Fact]
-    public async Task CallingMatchAsyncAfterThenAsync_WhenIsSuccess_ShouldExecuteOnValueAction()
+    public async Task CallingMatchAsyncAfterThenAsync_WhenIsSuccess_ShouldExecuteThenAction()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = new List<Error> { Error.Validation(), Error.Conflict() };
-        Task<string> OnValueAction(Person _) => throw new Exception("Should not be called");
+        Task<string> ThenAction(Person _) => throw new Exception("Should not be called");
 
-        Task<string> OnErrorsAction(IReadOnlyList<Error> errors)
+        Task<string> ElsesAction(IReadOnlyList<Error> errors)
         {
             errors.Should().BeEquivalentTo(errorOrPerson.Errors);
             return Task.FromResult("Nice");
@@ -135,7 +135,7 @@ public class MatchAsyncTests
         // Act
         Func<Task<string>> action = () => errorOrPerson
             .ThenAsync(person => Task.FromResult(person))
-            .MatchAsync(OnValueAction, OnErrorsAction);
+            .MatchAsync(ThenAction, ElsesAction);
 
         // Assert
         (await action.Should().NotThrowAsync()).Subject.Should().Be("Nice");

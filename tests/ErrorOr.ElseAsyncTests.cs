@@ -57,7 +57,7 @@ public class ElseAsyncTests
     }
 
     [Fact]
-    public async Task CallingElseAsyncWithValue_WhenIsError_ShouldReturnElseValue()
+    public async Task CallingElseAsyncWithValue_WhenIsError_ShouldInvokeElseFunc()
     {
         // Arrange
         ErrorOr<string> errorOrString = Error.NotFound();

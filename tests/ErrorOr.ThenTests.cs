@@ -30,9 +30,9 @@ public class ThenTests
 
         // Act
         ErrorOr<int> result = errorOrString
-            .Then(str => { _ = 5; })
+            .ThenDo(str => { _ = 5; })
             .Then(str => ConvertToInt(str))
-            .Then(str => { _ = 5; });
+            .ThenDo(str => { _ = 5; });
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -49,7 +49,7 @@ public class ThenTests
         ErrorOr<string> result = errorOrString
             .Then(str => ConvertToInt(str))
             .Then(num => num * 2)
-            .Then(str => { _ = 5; })
+            .ThenDo(str => { _ = 5; })
             .Then(num => ConvertToString(num));
 
         // Assert
@@ -70,7 +70,7 @@ public class ThenTests
             .ThenAsync(num => ConvertToStringAsync(num))
             .Then(str => ConvertToInt(str))
             .ThenAsync(num => ConvertToStringAsync(num))
-            .Then(num => { _ = 5; });
+            .ThenDo(num => { _ = 5; });
 
         // Assert
         result.IsError.Should().BeFalse();

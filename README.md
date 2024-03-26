@@ -19,7 +19,12 @@
 - [Give it a star ⭐!](#give-it-a-star-)
 - [Getting Started 🏃](#getting-started-)
   - [Replace throwing exceptions with `ErrorOr<T>`](#replace-throwing-exceptions-with-errorort)
-  - [Return Multiple Errors When Needed](#return-multiple-errors-when-needed)
+  - [Support For Multiple Errors](#support-for-multiple-errors)
+  - [Various Functional Methods and Extension Methods](#various-functional-methods-and-extension-methods)
+    - [Real world example](#real-world-example)
+    - [Simple Example with intermediate steps](#simple-example-with-intermediate-steps)
+      - [No Failure](#no-failure)
+      - [Failure](#failure)
 - [Creating an `ErrorOr` instance](#creating-an-erroror-instance)
   - [Using implicit conversion](#using-implicit-conversion)
   - [Using The `ErrorOrFactory`](#using-the-errororfactory)
@@ -44,11 +49,13 @@
   - [`Then`](#then)
     - [`Then`](#then-1)
     - [`ThenAsync`](#thenasync)
-    - [Mixing `Then` and `ThenAsync`](#mixing-then-and-thenasync)
+    - [`ThenDo` and `ThenDoAsync`](#thendo-and-thendoasync)
+    - [Mixing `Then`, `ThenDo`, `ThenAsync`, `ThenDoAsync`](#mixing-then-thendo-thenasync-thendoasync)
+  - [`FailIf`](#failif)
   - [`Else`](#else)
     - [`Else`](#else-1)
     - [`ElseAsync`](#elseasync)
-- [Mixing Features (`Then`, `Else`, `Switch`, `Match`)](#mixing-features-then-else-switch-match)
+- [Mixing Features (`Then`, `FailIf`, `Else`, `Switch`, `Match`)](#mixing-features-then-failif-else-switch-match)
 - [Error Types](#error-types)
   - [Built in error types](#built-in-error-types)
   - [Custom error types](#custom-error-types)
@@ -127,7 +134,7 @@ Divide(4, 2)
         onFirstError: error => Console.WriteLine(error.Description));
 ```
 
-## Return Multiple Errors When Needed
+## Support For Multiple Errors
 
 Internally, the `ErrorOr` object has a list of `Error`s, so if you have multiple errors, you don't need to compromise and have only the first one.
 
@@ -162,6 +169,62 @@ public class User(string _name)
     }
 }
 ```
+
+## Various Functional Methods and Extension Methods
+
+The `ErrorOr` object has a variety of methods that allow you to work with it in a functional way.
+
+This allows you to chain methods together, and handle the result in a clean and concise way.
+
+### Real world example
+
+```cs
+return await _userRepository.GetByIdAsync(id)
+    .Then(user => user.IncrementAge()
+        .Then(success => user)
+        .Else(errors => Error.Unexpected("Not expected to fail")))
+    .FailIf(user => !user.IsOverAge(18), UserErrors.UnderAge)
+    .ThenDo(user => _logger.LogInformation($"User {user.Id} incremented age to {user.Age}"))
+    .ThenAsync(user => _userRepository.UpdateAsync(user))
+    .Match(
+        _ => NoContent(),
+        errors => errors.ToActionResult());
+```
+
+### Simple Example with intermediate steps
+
+#### No Failure
+
+```cs
+ErrorOr<string> foo = await "2".ToErrorOr()
+    .Then(int.Parse) // 2
+    .FailIf(val => val > 2, Error.Validation(description: $"{val} is too big") // 2
+    .ThenDoAsync(Task.Delay) // Sleep for 2 milliseconds
+    .ThenDo(val => Console.WriteLine($"Finished waiting {val} milliseconds.")) // Finished waiting 2 milliseconds.
+    .ThenAsync(val => Task.FromResult(val * 2)) // 4
+    .Then(val => $"The result is {val}") // "The result is 4"
+    .Else(errors => Error.Unexpected(description: "Yikes")) // "The result is 4"
+    .MatchFirst(
+        value => value, // "The result is 4"
+        firstError => $"An error occurred: {firstError.Description}");
+```
+
+#### Failure
+
+```cs
+ErrorOr<string> foo = await "5".ToErrorOr()
+    .Then(int.Parse) // 5
+    .FailIf(val => val > 2, Error.Validation(description: $"{val} is too big") // Error.Validation()
+    .ThenDoAsync(Task.Delay) // Error.Validation()
+    .ThenDo(val => Console.WriteLine($"Finished waiting {val} milliseconds.")) // Error.Validation()
+    .ThenAsync(val => Task.FromResult(val * 2)) // Error.Validation()
+    .Then(val => $"The result is {val}") // Error.Validation()
+    .Else(errors => Error.Unexpected(description: "Yikes")) // Error.Unexpected()
+    .MatchFirst(
+        value => value,
+        firstError => $"An error occurred: {firstError.Description}"); // An error occurred: 5 is too big
+```
+
 
 # Creating an `ErrorOr` instance
 
@@ -388,7 +451,7 @@ await result.SwitchFirstAsync(
 
 ### `Then`
 
-`Then` receives an action or a function, and invokes it only if the result is not an error.
+`Then` receives a function, and invokes it only if the result is not an error.
 
 ```cs
 ErrorOr<int> foo = result
@@ -417,24 +480,63 @@ ErrorOr<string> foo = result
 
 ### `ThenAsync`
 
-`ThenAsync` receives an asynchronous action or function, and invokes it only if the result is not an error.
+`ThenAsync` receives an asynchronous function, and invokes it only if the result is not an error.
 
 ```cs
 ErrorOr<string> foo = await result
-    .ThenAsync(val => Task.Delay(val))
-    .ThenAsync(val => Task.FromResult($"The result is {val}"));
+    .ThenAsync(val => DoSomethingAsync(val))
+    .ThenAsync(val => DoSomethingElseAsync($"The result is {val}"));
 ```
 
-### Mixing `Then` and `ThenAsync`
+### `ThenDo` and `ThenDoAsync`
 
-You can mix `Then` and `ThenAsync` methods together.
+`ThenDo` and `ThenDoAsync` are similar to `Then` and `ThenAsync`, but instead of invoking a function that returns a value, they invoke an action.
+
+```cs
+ErrorOr<string> foo = result
+    .ThenDo(val => Console.WriteLine(val))
+    .ThenDo(val => Console.WriteLine($"The result is {val}"));
+```
 
 ```cs
 ErrorOr<string> foo = await result
-    .ThenAsync(val => Task.Delay(val))
-    .Then(val => Console.WriteLine($"Finsihed waiting {val} seconds."))
+    .ThenDoAsync(val => Task.Delay(val))
+    .ThenDo(val => Console.WriteLine($"Finsihed waiting {val} seconds."))
+    .ThenDoAsync(val => Task.FromResult(val * 2))
+    .ThenDo(val => $"The result is {val}");
+```
+
+### Mixing `Then`, `ThenDo`, `ThenAsync`, `ThenDoAsync`
+
+You can mix and match `Then`, `ThenDo`, `ThenAsync`, `ThenDoAsync` methods.
+
+```cs
+ErrorOr<string> foo = await result
+    .ThenDoAsync(val => Task.Delay(val))
+    .Then(val => val * 2)
+    .ThenAsync(val => DoSomethingAsync(val))
+    .ThenDo(val => Console.WriteLine($"Finsihed waiting {val} seconds."))
     .ThenAsync(val => Task.FromResult(val * 2))
     .Then(val => $"The result is {val}");
+```
+
+## `FailIf`
+
+`FailIf` receives a predicate and an error. If the predicate is true, `FailIf` will return the error. Otherwise, it will return the value of the result.
+
+```cs
+ErrorOr<int> foo = result
+    .FailIf(val => val > 2, Error.Validation(description: $"{val} is too big"));
+```
+
+Once an error is returned, the chain will break and the error will be returned.
+
+```cs
+var result = "2".ToErrorOr()
+    .Then(int.Parse) // 2
+    .FailIf(val => val > 1, Error.Validation(description: $"{val} is too big") // validation error
+    .Then(num => num * 2) // this function will not be invoked
+    .Then(num => num * 2) // this function will not be invoked
 ```
 
 ## `Else`
@@ -465,14 +567,15 @@ ErrorOr<string> foo = await result
     .ElseAsync(errors => Task.FromResult($"{errors.Count} errors occurred."));
 ```
 
-# Mixing Features (`Then`, `Else`, `Switch`, `Match`)
+# Mixing Features (`Then`, `FailIf`, `Else`, `Switch`, `Match`)
 
-You can mix `Then`, `Else`, `Switch` and `Match` methods together.
+You can mix `Then`, `FailIf`, `Else`, `Switch` and `Match` methods together.
 
 ```cs
 ErrorOr<string> foo = await result
-    .ThenAsync(val => Task.Delay(val))
-    .Then(val => Console.WriteLine($"Finsihed waiting {val} seconds."))
+    .ThenDoAsync(val => Task.Delay(val))
+    .FailIf(val => val > 2, Error.Validation(description: $"{val} is too big"))
+    .ThenDo(val => Console.WriteLine($"Finished waiting {val} seconds."))
     .ThenAsync(val => Task.FromResult(val * 2))
     .Then(val => $"The result is {val}")
     .Else(errors => Error.Unexpected())

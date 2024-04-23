@@ -20,4 +20,20 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
 
         return onValue(Value) ? error : this;
     }
+
+    /// <summary>
+    /// If the state is error, the provider <paramref name="onValue"/> is invoked asynchronously.
+    /// </summary>
+    /// <param name="onValue">The function to execute if the statement is value.</param>
+    /// <param name="error">The <see cref="Error"/> to return if the given <paramref name="onValue"/> function returned true.</param>
+    /// <returns>The given <paramref name="error"/> if <paramref name="onValue"/> returns true; otherwise, the original <see cref="ErrorOr"/> instance.</returns>
+    public async Task<ErrorOr<TValue>> FailIfAsync(Func<TValue, Task<bool>> onValue, Error error)
+    {
+        if (IsError)
+        {
+            return this;
+        }
+
+        return await onValue(Value).ConfigureAwait(false) ? error : this;
+    }
 }

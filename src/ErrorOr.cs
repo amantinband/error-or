@@ -8,14 +8,6 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     private readonly TValue? _value = default;
     private readonly List<Error>? _errors = null;
 
-    private static readonly Error NoFirstError = Error.Unexpected(
-        code: "ErrorOr.NoFirstError",
-        description: "First error cannot be retrieved from a successful ErrorOr.");
-
-    private static readonly Error NoErrors = Error.Unexpected(
-        code: "ErrorOr.NoErrors",
-        description: "Error list cannot be retrieved from a successful ErrorOr.");
-
     /// <summary>
     /// Gets a value indicating whether the state is error.
     /// </summary>
@@ -24,12 +16,12 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <summary>
     /// Gets the list of errors. If the state is not error, the list will contain a single error representing the state.
     /// </summary>
-    public List<Error> Errors => IsError ? _errors! : new List<Error> { NoErrors };
+    public List<Error> Errors => IsError ? _errors! : KnownErrors.CachedNoErrorsList;
 
     /// <summary>
     /// Gets the list of errors. If the state is not error, the list will be empty.
     /// </summary>
-    public List<Error> ErrorsOrEmptyList => IsError ? _errors! : new();
+    public List<Error> ErrorsOrEmptyList => IsError ? _errors! : KnownErrors.CachedEmptyErrorsList;
 
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
@@ -53,7 +45,7 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
         {
             if (!IsError)
             {
-                return NoFirstError;
+                return KnownErrors.NoFirstError;
             }
 
             return _errors![0];

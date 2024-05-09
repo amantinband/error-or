@@ -23,6 +23,11 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// </summary>
     public static implicit operator ErrorOr<TValue>(List<Error> errors)
     {
+        if (errors is null)
+        {
+            throw new ArgumentNullException(nameof(errors));
+        }
+
         if (errors.Count == 0)
         {
             throw new InvalidOperationException("Cannot create an ErrorOr<TValue> from an empty list of errors. Provide at least one error.");
@@ -36,6 +41,11 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// </summary>
     public static implicit operator ErrorOr<TValue>(Error[] errors)
     {
+        if (errors is null)
+        {
+            throw new ArgumentNullException(nameof(errors));
+        }
+
         if (errors.Length == 0)
         {
             throw new InvalidOperationException("Cannot create an ErrorOr<TValue> from an empty array of errors. Provide at least one error.");

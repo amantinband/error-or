@@ -376,4 +376,22 @@ public class ErrorOrInstantiationTests
         // Assert
         errorOrInt.Should().ThrowExactly<InvalidOperationException>();
     }
+
+    [Fact]
+    public void CreateErrorOr_WhenNullIsPassedAsErrorsList_ShouldThrowArgumentNullException()
+    {
+        Func<ErrorOr<int>> act = () => default(List<Error>)!;
+
+        act.Should().ThrowExactly<ArgumentNullException>()
+           .And.ParamName.Should().Be("errors");
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenNullIsPassedAsErrorsArray_ShouldThrowArgumentNullException()
+    {
+        Func<ErrorOr<int>> act = () => default(Error[])!;
+
+        act.Should().ThrowExactly<ArgumentNullException>()
+           .And.ParamName.Should().Be("errors");
+    }
 }

@@ -3,7 +3,8 @@ namespace ErrorOr;
 public static partial class ErrorOrExtensions
 {
     /// <summary>
-    /// If the state is error, the provided function <paramref name="onValue"/> is executed and its result is returned.
+    /// If the state is value, the provided function <paramref name="onValue"/> is invoked asynchronously.
+    /// If <paramref name="onValue"/> returns true, the given <paramref name="error"/> will be returned, and the state will be error.
     /// </summary>
     /// <param name="errorOr">The <see cref="ErrorOr"/> instance.</param>
     /// <param name="onValue">The function to execute if the state is a value.</param>
@@ -21,7 +22,8 @@ public static partial class ErrorOrExtensions
     }
 
     /// <summary>
-    /// If the state is error, the provider <paramref name="onValue"/> is invoked asynchronously.
+    /// If the state is value, the provided function <paramref name="onValue"/> is invoked asynchronously.
+    /// If <paramref name="onValue"/> returns true, the given <paramref name="error"/> will be returned, and the state will be error.
     /// </summary>
     /// <param name="errorOr">The <see cref="ErrorOr"/> instance.</param>
     /// <param name="onValue">The function to execute if the statement is value.</param>

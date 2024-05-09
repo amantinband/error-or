@@ -364,7 +364,9 @@ public class ErrorOrInstantiationTests
         Func<ErrorOr<int>> errorOrInt = () => new List<Error>();
 
         // Assert
-        errorOrInt.Should().ThrowExactly<InvalidOperationException>();
+        var exception = errorOrInt.Should().ThrowExactly<ArgumentException>().Which;
+        exception.Message.Should().Be("Cannot create an ErrorOr<TValue> from an empty list of errors. Provide at least one error. (Parameter 'errors')");
+        exception.ParamName.Should().Be("errors");
     }
 
     [Fact]
@@ -374,7 +376,9 @@ public class ErrorOrInstantiationTests
         Func<ErrorOr<int>> errorOrInt = () => Array.Empty<Error>();
 
         // Assert
-        errorOrInt.Should().ThrowExactly<InvalidOperationException>();
+        var exception = errorOrInt.Should().ThrowExactly<ArgumentException>().Which;
+        exception.Message.Should().Be("Cannot create an ErrorOr<TValue> from an empty array of errors. Provide at least one error. (Parameter 'errors')");
+        exception.ParamName.Should().Be("errors");
     }
 
     [Fact]

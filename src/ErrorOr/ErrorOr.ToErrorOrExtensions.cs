@@ -19,10 +19,12 @@ public static partial class ErrorOrExtensions
     }
 
     /// <summary>
-    /// Creates an <see cref="ErrorOr{TValue}"/> instance with the given <paramref name="error"/>.
+    /// Creates an <see cref="ErrorOr{TValue}"/> instance with the given <paramref name="errors"/>.
     /// </summary>
-    public static ErrorOr<TValue> ToErrorOr<TValue>(this List<Error> error)
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="errors"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when <paramref name="errors" /> is an empty list.</exception>
+    public static ErrorOr<TValue> ToErrorOr<TValue>(this List<Error> errors)
     {
-        return error;
+        return errors;
     }
 }

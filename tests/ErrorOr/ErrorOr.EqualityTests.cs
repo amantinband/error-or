@@ -9,7 +9,7 @@ public sealed class ErrorOrEqualityTests
     private record Person(string Name);
 
     public static readonly TheoryData<Error[], Error[]> DifferentErrors =
-        new ()
+        new()
         {
             {
                 // Different number of entries
@@ -36,10 +36,10 @@ public sealed class ErrorOrEqualityTests
             },
         };
 
-    public static readonly TheoryData<string> Names = new () { "Amichai", "feO2x" };
+    public static readonly TheoryData<string> Names = new() { "Amichai", "feO2x" };
 
     public static readonly TheoryData<string, string> DifferentNames =
-        new () { { "Amichai", "feO2x" }, { "Tyrion", "Cersei" } };
+        new() { { "Amichai", "feO2x" }, { "Tyrion", "Cersei" } };
 
     [Fact]
     public void Equals_WhenTwoInstancesHaveTheSameErrorsCollection_ShouldReturnTrue()

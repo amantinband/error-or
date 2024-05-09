@@ -13,10 +13,10 @@ public class ThenAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
+            .ThenAsync(Convert.ToIntAsync)
             .ThenAsync(num => Task.FromResult(num * 2))
             .ThenDoAsync(num => Task.Run(() => { _ = 5; }))
-            .ThenAsync(num => ConvertToStringAsync(num));
+            .ThenAsync(Convert.ToStringAsync);
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -31,17 +31,13 @@ public class ThenAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
+            .ThenAsync(Convert.ToIntAsync)
             .ThenAsync(num => Task.FromResult(num * 2))
             .ThenDoAsync(num => Task.Run(() => { _ = 5; }))
-            .ThenAsync(num => ConvertToStringAsync(num));
+            .ThenAsync(Convert.ToStringAsync);
 
         // Assert
         result.IsError.Should().BeTrue();
         result.FirstError.Should().BeEquivalentTo(errorOrString.FirstError);
     }
-
-    private static Task<ErrorOr<string>> ConvertToStringAsync(int num) => Task.FromResult(ErrorOrFactory.From(num.ToString()));
-
-    private static Task<ErrorOr<int>> ConvertToIntAsync(string str) => Task.FromResult(ErrorOrFactory.From(int.Parse(str)));
 }

@@ -3,17 +3,19 @@ using FluentAssertions;
 
 namespace Tests;
 
-public class FailIfTests
+public class FailIfAsyncTests
 {
+    private record Person(string Name);
+
     [Fact]
-    public void CallingFailIf_WhenFailsIf_ShouldReturnError()
+    public async Task CallingFailIfAsync_WhenFailsIf_ShouldReturnError()
     {
         // Arrange
         ErrorOr<int> errorOrInt = 5;
 
         // Act
-        ErrorOr<int> result = errorOrInt
-            .FailIf(num => num > 3, Error.Failure());
+        ErrorOr<int> result = await errorOrInt
+            .FailIfAsync(num => Task.FromResult(num > 3), Error.Failure());
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -21,7 +23,7 @@ public class FailIfTests
     }
 
     [Fact]
-    public async Task CallingFailIfExtensionMethod_WhenFailsIf_ShouldReturnError()
+    public async Task CallingFailIfAsyncExtensionMethod_WhenFailsIf_ShouldReturnError()
     {
         // Arrange
         ErrorOr<int> errorOrInt = 5;
@@ -29,7 +31,7 @@ public class FailIfTests
         // Act
         ErrorOr<int> result = await errorOrInt
             .ThenAsync(num => Task.FromResult(num))
-            .FailIf(num => num > 3, Error.Failure());
+            .FailIfAsync(num => Task.FromResult(num > 3), Error.Failure());
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -37,14 +39,14 @@ public class FailIfTests
     }
 
     [Fact]
-    public void CallingFailIf_WhenDoesNotFailIf_ShouldReturnValue()
+    public async Task CallingFailIfAsync_WhenDoesNotFailIf_ShouldReturnValue()
     {
         // Arrange
         ErrorOr<int> errorOrInt = 5;
 
         // Act
-        ErrorOr<int> result = errorOrInt
-            .FailIf(num => num > 10, Error.Failure());
+        ErrorOr<int> result = await errorOrInt
+            .FailIfAsync(num => Task.FromResult(num > 10), Error.Failure());
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -52,14 +54,14 @@ public class FailIfTests
     }
 
     [Fact]
-    public void CallingFailIf_WhenIsError_ShouldNotInvokeFailIfFunc()
+    public async Task CallingFailIf_WhenIsError_ShouldNotInvokeFailIfFunc()
     {
         // Arrange
         ErrorOr<string> errorOrString = Error.NotFound();
 
         // Act
-        ErrorOr<string> result = errorOrString
-            .FailIf(str => str == string.Empty, Error.Failure());
+        ErrorOr<string> result = await errorOrString
+            .FailIfAsync(str => Task.FromResult(str == string.Empty), Error.Failure());
 
         // Assert
         result.IsError.Should().BeTrue();

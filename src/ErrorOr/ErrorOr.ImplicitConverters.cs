@@ -21,6 +21,8 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
     /// </summary>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="errors"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when <paramref name="errors" /> is an empty list.</exception>
     public static implicit operator ErrorOr<TValue>(List<Error> errors)
     {
         if (errors is null)
@@ -39,6 +41,8 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <summary>
     /// Creates an <see cref="ErrorOr{TValue}"/> from a list of errors.
     /// </summary>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="errors"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when <paramref name="errors" /> is an empty array.</exception>
     public static implicit operator ErrorOr<TValue>(Error[] errors)
     {
         if (errors is null)

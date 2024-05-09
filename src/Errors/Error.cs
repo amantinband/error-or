@@ -164,10 +164,12 @@ public readonly record struct Error
 #pragma warning disable SA1129 // HashCode needs to be instantiated this way
         var hashCode = new HashCode();
 #pragma warning restore SA1129
+
         hashCode.Add(Code);
         hashCode.Add(Description);
         hashCode.Add(Type);
         hashCode.Add(NumericType);
+
         foreach (var keyValuePair in Metadata!)
         {
             hashCode.Add(keyValuePair.Key);

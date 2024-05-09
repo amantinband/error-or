@@ -27,4 +27,14 @@ public static partial class ErrorOrExtensions
     {
         return errors;
     }
+
+    /// <summary>
+    /// Creates an <see cref="ErrorOr{TValue}"/> instance with the given <paramref name="errors"/>.
+    /// </summary>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="errors"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when <paramref name="errors" /> is an empty array.</exception>
+    public static ErrorOr<TValue> ToErrorOr<TValue>(this Error[] errors)
+    {
+        return errors;
+    }
 }

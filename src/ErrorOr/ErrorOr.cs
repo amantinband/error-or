@@ -22,19 +22,16 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     private ErrorOr(Error error)
     {
         _errors = [error];
-        IsError = true;
     }
 
     private ErrorOr(List<Error> errors)
     {
         _errors = errors;
-        IsError = true;
     }
 
     private ErrorOr(TValue value)
     {
         _value = value;
-        IsError = false;
     }
 
     /// <summary>
@@ -44,7 +41,7 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     [MemberNotNullWhen(true, nameof(Errors))]
     [MemberNotNullWhen(false, nameof(Value))]
     [MemberNotNullWhen(false, nameof(_value))]
-    public bool IsError { get; }
+    public bool IsError => _errors is not null;
 
     /// <summary>
     /// Gets the list of errors. If the state is not error, the list will contain a single error representing the state.

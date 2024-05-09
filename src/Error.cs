@@ -137,4 +137,67 @@ public readonly record struct Error
         NumericType = (int)type;
         Metadata = metadata;
     }
+
+    public bool Equals(Error other)
+    {
+        if (Type != other.Type ||
+            NumericType != other.NumericType ||
+            Code != other.Code ||
+            Description != other.Description)
+        {
+            return false;
+        }
+
+        if (Metadata is null)
+        {
+            return other.Metadata is null;
+        }
+
+        return other.Metadata is not null && CompareMetadata(Metadata, other.Metadata);
+    }
+
+    private static bool CompareMetadata(Dictionary<string, object> metadata, Dictionary<string, object> otherMetadata)
+    {
+        if (ReferenceEquals(metadata, otherMetadata))
+        {
+            return true;
+        }
+
+        if (metadata.Count != otherMetadata.Count)
+        {
+            return false;
+        }
+
+        foreach (var keyValuePair in metadata)
+        {
+            if (!otherMetadata.TryGetValue(keyValuePair.Key, out var otherValue) ||
+                !keyValuePair.Value.Equals(otherValue))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public override int GetHashCode() =>
+        Metadata is null ? HashCode.Combine(Code, Description, Type, NumericType) : ComposeHashCode();
+
+    private int ComposeHashCode()
+    {
+#pragma warning disable SA1129 // HashCode needs to be instantiated this way
+        var hashCode = new HashCode();
+#pragma warning restore SA1129
+        hashCode.Add(Code);
+        hashCode.Add(Description);
+        hashCode.Add(Type);
+        hashCode.Add(NumericType);
+        foreach (var keyValuePair in Metadata!)
+        {
+            hashCode.Add(keyValuePair.Key);
+            hashCode.Add(keyValuePair.Value);
+        }
+
+        return hashCode.ToHashCode();
+    }
 }

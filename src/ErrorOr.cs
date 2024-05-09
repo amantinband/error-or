@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace ErrorOr;
 
 /// <summary>
@@ -11,6 +13,10 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <summary>
     /// Gets a value indicating whether the state is error.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(_errors))]
+    [MemberNotNullWhen(true, nameof(Errors))]
+    [MemberNotNullWhen(false, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(_value))]
     public bool IsError { get; }
 
     /// <summary>

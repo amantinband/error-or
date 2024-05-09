@@ -14,6 +14,7 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <summary>
     /// Prevents a default <see cref="ErrorOr"/> struct from being created.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when this method is called.</exception>
     public ErrorOr()
     {
         throw new InvalidOperationException("Default construction of ErrorOr<TValue> is invalid. Please use provided factory methods to instantiate.");
@@ -46,6 +47,7 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <summary>
     /// Gets the list of errors. If the state is not error, the list will contain a single error representing the state.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when no errors are present.</exception>
     public List<Error> Errors => IsError ? _errors : throw new InvalidOperationException("The Errors property cannot be accessed when no errors have been recorded. Check IsError before accessing Errors.");
 
     /// <summary>
@@ -56,6 +58,7 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <summary>
     /// Gets the value.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when no value is present.</exception>
     public TValue Value
     {
         get
@@ -72,6 +75,7 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <summary>
     /// Gets the first error.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when no errors are present.</exception>
     public Error FirstError
     {
         get

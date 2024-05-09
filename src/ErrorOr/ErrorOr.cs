@@ -56,7 +56,18 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <summary>
     /// Gets the value.
     /// </summary>
-    public TValue Value => _value!;
+    public TValue Value
+    {
+        get
+        {
+            if (IsError)
+            {
+                throw new InvalidOperationException("The Value property cannot be accessed when errors have been recorded. Check IsError before accessing Value.");
+            }
+
+            return _value;
+        }
+    }
 
     /// <summary>
     /// Gets the first error.

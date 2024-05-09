@@ -144,17 +144,18 @@ public class ErrorOrInstantiationTests
     }
 
     [Fact]
-    public void CreateFromErrorList_WhenAccessingValue_ShouldReturnDefault()
+    public void CreateFromErrorList_WhenAccessingValue_ShouldThrowInvalidOperationException()
     {
         // Arrange
         List<Error> errors = new() { Error.Validation("User.Name", "Name is too short") };
         ErrorOr<Person> errorOrPerson = ErrorOr<Person>.From(errors);
 
         // Act
-        Person value = errorOrPerson.Value;
+        var act = () => errorOrPerson.Value;
 
         // Assert
-        value.Should().Be(default);
+        act.Should().Throw<InvalidOperationException>()
+           .And.Message.Should().Be("The Value property cannot be accessed when errors have been recorded. Check IsError before accessing Value.");
     }
 
     [Fact]
@@ -247,16 +248,17 @@ public class ErrorOrInstantiationTests
     }
 
     [Fact]
-    public void ImplicitCastError_WhenAccessingValue_ShouldReturnDefault()
+    public void ImplicitCastError_WhenAccessingValue_ShouldThrowInvalidOperationException()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = Error.Validation("User.Name", "Name is too short");
 
         // Act
-        Person value = errorOrPerson.Value;
+        var act = () => errorOrPerson.Value;
 
         // Assert
-        value.Should().Be(default);
+        act.Should().Throw<InvalidOperationException>()
+           .And.Message.Should().Be("The Value property cannot be accessed when errors have been recorded. Check IsError before accessing Value.");
     }
 
     [Fact]

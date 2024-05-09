@@ -21,7 +21,7 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
 
     private ErrorOr(Error error)
     {
-        _errors = new List<Error> { error };
+        _errors = [error];
         IsError = true;
     }
 

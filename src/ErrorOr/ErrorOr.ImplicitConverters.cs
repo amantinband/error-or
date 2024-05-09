@@ -38,7 +38,7 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     {
         if (errors.Length == 0)
         {
-            throw new InvalidOperationException("Cannot create an ErrorOr<TValue> from an empty list of errors. Provide at least one error.");
+            throw new InvalidOperationException("Cannot create an ErrorOr<TValue> from an empty array of errors. Provide at least one error.");
         }
 
         return new ErrorOr<TValue>(errors.ToList());

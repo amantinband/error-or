@@ -3,7 +3,7 @@ namespace Tests;
 using ErrorOr;
 using FluentAssertions;
 
-public class ErrorOrTests
+public class ErrorOrInstantiationTests
 {
     private record Person(string Name);
 
@@ -343,5 +343,37 @@ public class ErrorOrTests
         // Assert
         errorOrPerson.IsError.Should().BeTrue();
         errorOrPerson.FirstError.Should().Be(errors[0]);
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenUsingEmptyConstructor_ShouldThrow()
+    {
+        // Act
+#pragma warning disable SA1129 // Do not use default value type constructor
+        Func<ErrorOr<int>> errorOrInt = () => new ErrorOr<int>();
+#pragma warning restore SA1129 // Do not use default value type constructor
+
+        // Assert
+        errorOrInt.Should().ThrowExactly<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenEmptyErrorsList_ShouldThrow()
+    {
+        // Act
+        Func<ErrorOr<int>> errorOrInt = () => new List<Error>();
+
+        // Assert
+        errorOrInt.Should().ThrowExactly<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenEmptyErrorsArray_ShouldThrow()
+    {
+        // Act
+        Func<ErrorOr<int>> errorOrInt = () => Array.Empty<Error>();
+
+        // Assert
+        errorOrInt.Should().ThrowExactly<InvalidOperationException>();
     }
 }

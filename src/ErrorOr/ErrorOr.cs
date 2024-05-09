@@ -7,6 +7,14 @@ namespace ErrorOr;
 /// </summary>
 public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
 {
+    /// <summary>
+    /// Prevents a default <see cref="ErrorOr"/> struct from being created.
+    /// </summary>
+    public ErrorOr()
+    {
+        throw new InvalidOperationException("Default construction of ErrorOr<TValue> is invalid. Please use provided factory methods to instantiate.");
+    }
+
     private readonly TValue? _value = default;
     private readonly List<Error>? _errors = null;
 

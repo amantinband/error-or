@@ -37,7 +37,7 @@ public class ToErrorOrTests
     public void ListOfErrorsToErrorOr_WhenAccessingErrors_ShouldReturnSameErrors()
     {
         // Arrange
-        List<Error> errors = new List<Error> { Error.Unauthorized(), Error.Validation() };
+        List<Error> errors = [Error.Unauthorized(), Error.Validation()];
 
         // Act
         ErrorOr<int> result = errors.ToErrorOr<int>();

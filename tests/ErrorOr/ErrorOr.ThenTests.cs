@@ -13,9 +13,9 @@ public class ThenTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
+            .Then(Convert.ToInt)
             .Then(num => num * 2)
-            .Then(num => ConvertToString(num));
+            .Then(Convert.ToString);
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -31,7 +31,7 @@ public class ThenTests
         // Act
         ErrorOr<int> result = errorOrString
             .ThenDo(str => { _ = 5; })
-            .Then(str => ConvertToInt(str))
+            .Then(Convert.ToInt)
             .ThenDo(str => { _ = 5; });
 
         // Assert
@@ -47,10 +47,10 @@ public class ThenTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
+            .Then(Convert.ToInt)
             .Then(num => num * 2)
             .ThenDo(str => { _ = 5; })
-            .Then(num => ConvertToString(num));
+            .Then(Convert.ToString);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -65,11 +65,11 @@ public class ThenTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
+            .ThenAsync(Convert.ToIntAsync)
             .Then(num => num * 2)
-            .ThenAsync(num => ConvertToStringAsync(num))
-            .Then(str => ConvertToInt(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToStringAsync)
+            .Then(Convert.ToInt)
+            .ThenAsync(Convert.ToStringAsync)
             .ThenDo(num => { _ = 5; });
 
         // Assert
@@ -85,19 +85,11 @@ public class ThenTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .Then(num => ConvertToString(num));
+            .ThenAsync(Convert.ToIntAsync)
+            .Then(Convert.ToString);
 
         // Assert
         result.IsError.Should().BeTrue();
         result.FirstError.Should().BeEquivalentTo(errorOrString.FirstError);
     }
-
-    private static ErrorOr<string> ConvertToString(int num) => num.ToString();
-
-    private static ErrorOr<int> ConvertToInt(string str) => int.Parse(str);
-
-    private static Task<ErrorOr<int>> ConvertToIntAsync(string str) => Task.FromResult(ErrorOrFactory.From(int.Parse(str)));
-
-    private static Task<ErrorOr<string>> ConvertToStringAsync(int num) => Task.FromResult(ErrorOrFactory.From(num.ToString()));
 }

@@ -13,8 +13,8 @@ public class ElseAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToIntAsync)
+            .ThenAsync(Convert.ToStringAsync)
             .ElseAsync(errors => Task.FromResult($"Error count: {errors.Count}"));
 
         // Assert
@@ -30,8 +30,8 @@ public class ElseAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToIntAsync)
+            .ThenAsync(Convert.ToStringAsync)
             .ElseAsync(errors => Task.FromResult($"Error count: {errors.Count}"));
 
         // Assert
@@ -47,8 +47,8 @@ public class ElseAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToIntAsync)
+            .ThenAsync(Convert.ToStringAsync)
             .ElseAsync(Task.FromResult("oh no"));
 
         // Assert
@@ -64,8 +64,8 @@ public class ElseAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToIntAsync)
+            .ThenAsync(Convert.ToStringAsync)
             .ElseAsync(Task.FromResult("oh no"));
 
         // Assert
@@ -81,8 +81,8 @@ public class ElseAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToIntAsync)
+            .ThenAsync(Convert.ToStringAsync)
             .ElseAsync(Task.FromResult(Error.Unexpected()));
 
         // Assert
@@ -98,8 +98,8 @@ public class ElseAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToIntAsync)
+            .ThenAsync(Convert.ToStringAsync)
             .ElseAsync(Task.FromResult(Error.Unexpected()));
 
         // Assert
@@ -115,8 +115,8 @@ public class ElseAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToIntAsync)
+            .ThenAsync(Convert.ToStringAsync)
             .ElseAsync(errors => Task.FromResult(Error.Unexpected()));
 
         // Assert
@@ -132,8 +132,8 @@ public class ElseAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToIntAsync)
+            .ThenAsync(Convert.ToStringAsync)
             .ElseAsync(errors => Task.FromResult(Error.Unexpected()));
 
         // Assert
@@ -149,8 +149,8 @@ public class ElseAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToIntAsync)
+            .ThenAsync(Convert.ToStringAsync)
             .ElseAsync(errors => Task.FromResult(new List<Error> { Error.Unexpected() }));
 
         // Assert
@@ -166,16 +166,12 @@ public class ElseAsyncTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .ThenAsync(str => ConvertToIntAsync(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .ThenAsync(Convert.ToIntAsync)
+            .ThenAsync(Convert.ToStringAsync)
             .ElseAsync(errors => Task.FromResult(new List<Error> { Error.Unexpected() }));
 
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.Should().Be(errorOrString.Value);
     }
-
-    private static Task<ErrorOr<string>> ConvertToStringAsync(int num) => Task.FromResult(ErrorOrFactory.From(num.ToString()));
-
-    private static Task<ErrorOr<int>> ConvertToIntAsync(string str) => Task.FromResult(ErrorOrFactory.From(int.Parse(str)));
 }

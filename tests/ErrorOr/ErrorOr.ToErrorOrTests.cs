@@ -37,7 +37,7 @@ public class ToErrorOrTests
     public void ListOfErrorsToErrorOr_WhenAccessingErrors_ShouldReturnSameErrors()
     {
         // Arrange
-        List<Error> errors = new List<Error> { Error.Unauthorized(), Error.Validation() };
+        List<Error> errors = [Error.Unauthorized(), Error.Validation()];
 
         // Act
         ErrorOr<int> result = errors.ToErrorOr<int>();
@@ -45,5 +45,16 @@ public class ToErrorOrTests
         // Assert
         result.IsError.Should().BeTrue();
         result.Errors.Should().BeEquivalentTo(errors);
+    }
+
+    [Fact]
+    public void ArrayOfErrorsToErrorOr_WhenAccessingErrors_ShouldReturnSimilarErrors()
+    {
+        Error[] errors = [Error.Unauthorized(), Error.Validation()];
+
+        ErrorOr<int> result = errors.ToErrorOr<int>();
+
+        result.IsError.Should().BeTrue();
+        result.Errors.Should().Equal(errors);
     }
 }

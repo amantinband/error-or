@@ -1,8 +1,5 @@
 namespace ErrorOr;
 
-/// <summary>
-/// A discriminated union of errors or a value.
-/// </summary>
 public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
 {
     /// <summary>

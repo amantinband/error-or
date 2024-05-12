@@ -3,7 +3,7 @@ namespace Tests;
 using ErrorOr;
 using FluentAssertions;
 
-public class ErrorOrTests
+public class ErrorOrInstantiationTests
 {
     private record Person(string Name);
 
@@ -11,7 +11,7 @@ public class ErrorOrTests
     public void CreateFromFactory_WhenAccessingValue_ShouldReturnValue()
     {
         // Arrange
-        IEnumerable<string> value = new[] { "value" };
+        IEnumerable<string> value = ["value"];
 
         // Act
         ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
@@ -22,24 +22,24 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void CreateFromFactory_WhenAccessingErrors_ShouldReturnUnexpectedError()
+    public void CreateFromFactory_WhenAccessingErrors_ShouldThrow()
     {
         // Arrange
-        IEnumerable<string> value = new[] { "value" };
+        IEnumerable<string> value = ["value"];
         ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
-        List<Error> errors = errorOrPerson.Errors;
+        Func<List<Error>> errors = () => errorOrPerson.Errors;
 
         // Assert
-        errors.Should().ContainSingle().Which.Type.Should().Be(ErrorType.Unexpected);
+        errors.Should().ThrowExactly<InvalidOperationException>();
     }
 
     [Fact]
     public void CreateFromFactory_WhenAccessingErrorsOrEmptyList_ShouldReturnEmptyList()
     {
         // Arrange
-        IEnumerable<string> value = new[] { "value" };
+        IEnumerable<string> value = ["value"];
         ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
@@ -50,24 +50,24 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void CreateFromFactory_WhenAccessingFirstError_ShouldReturnUnexpectedError()
+    public void CreateFromFactory_WhenAccessingFirstError_ShouldThrow()
     {
         // Arrange
-        IEnumerable<string> value = new[] { "value" };
+        IEnumerable<string> value = ["value"];
         ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
-        Error firstError = errorOrPerson.FirstError;
+        Func<Error> action = () => errorOrPerson.FirstError;
 
         // Assert
-        firstError.Type.Should().Be(ErrorType.Unexpected);
+        action.Should().ThrowExactly<InvalidOperationException>();
     }
 
     [Fact]
     public void CreateFromValue_WhenAccessingValue_ShouldReturnValue()
     {
         // Arrange
-        IEnumerable<string> value = new[] { "value" };
+        IEnumerable<string> value = ["value"];
 
         // Act
         ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
@@ -78,24 +78,24 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void CreateFromValue_WhenAccessingErrors_ShouldReturnUnexpectedError()
+    public void CreateFromValue_WhenAccessingErrors_ShouldThrow()
     {
         // Arrange
-        IEnumerable<string> value = new[] { "value" };
+        IEnumerable<string> value = ["value"];
         ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
-        List<Error> errors = errorOrPerson.Errors;
+        Func<List<Error>> action = () => errorOrPerson.Errors;
 
         // Assert
-        errors.Should().ContainSingle().Which.Type.Should().Be(ErrorType.Unexpected);
+        action.Should().ThrowExactly<InvalidOperationException>();
     }
 
     [Fact]
     public void CreateFromValue_WhenAccessingErrorsOrEmptyList_ShouldReturnEmptyList()
     {
         // Arrange
-        IEnumerable<string> value = new[] { "value" };
+        IEnumerable<string> value = ["value"];
         ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
@@ -106,17 +106,17 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void CreateFromValue_WhenAccessingFirstError_ShouldReturnUnexpectedError()
+    public void CreateFromValue_WhenAccessingFirstError_ShouldThrow()
     {
         // Arrange
-        IEnumerable<string> value = new[] { "value" };
+        IEnumerable<string> value = ["value"];
         ErrorOr<IEnumerable<string>> errorOrPerson = ErrorOrFactory.From(value);
 
         // Act
-        Error firstError = errorOrPerson.FirstError;
+        Func<Error> action = () => errorOrPerson.FirstError;
 
         // Assert
-        firstError.Type.Should().Be(ErrorType.Unexpected);
+        action.Should().ThrowExactly<InvalidOperationException>();
     }
 
     [Fact]
@@ -144,17 +144,18 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void CreateFromErrorList_WhenAccessingValue_ShouldReturnDefault()
+    public void CreateFromErrorList_WhenAccessingValue_ShouldThrowInvalidOperationException()
     {
         // Arrange
         List<Error> errors = new() { Error.Validation("User.Name", "Name is too short") };
         ErrorOr<Person> errorOrPerson = ErrorOr<Person>.From(errors);
 
         // Act
-        Person value = errorOrPerson.Value;
+        var act = () => errorOrPerson.Value;
 
         // Assert
-        value.Should().Be(default);
+        act.Should().Throw<InvalidOperationException>()
+           .And.Message.Should().Be("The Value property cannot be accessed when errors have been recorded. Check IsError before accessing Value.");
     }
 
     [Fact]
@@ -172,27 +173,27 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void ImplicitCastResult_WhenAccessingErrors_ShouldReturnUnexpectedError()
+    public void ImplicitCastResult_WhenAccessingErrors_ShouldThrow()
     {
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
 
         // Act
-        List<Error> errors = errorOrPerson.Errors;
+        Func<List<Error>> action = () => errorOrPerson.Errors;
 
         // Assert
-        errors.Should().ContainSingle().Which.Type.Should().Be(ErrorType.Unexpected);
+        action.Should().ThrowExactly<InvalidOperationException>();
     }
 
     [Fact]
-    public void ImplicitCastResult_WhenAccessingFirstError_ShouldReturnUnexpectedError()
+    public void ImplicitCastResult_WhenAccessingFirstError_ShouldThrow()
     {
         ErrorOr<Person> errorOrPerson = new Person("Amichai");
 
         // Act
-        Error firstError = errorOrPerson.FirstError;
+        Func<Error> action = () => errorOrPerson.FirstError;
 
         // Assert
-        firstError.Type.Should().Be(ErrorType.Unexpected);
+        action.Should().ThrowExactly<InvalidOperationException>();
     }
 
     [Fact]
@@ -247,16 +248,17 @@ public class ErrorOrTests
     }
 
     [Fact]
-    public void ImplicitCastError_WhenAccessingValue_ShouldReturnDefault()
+    public void ImplicitCastError_WhenAccessingValue_ShouldThrowInvalidOperationException()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = Error.Validation("User.Name", "Name is too short");
 
         // Act
-        Person value = errorOrPerson.Value;
+        var act = () => errorOrPerson.Value;
 
         // Assert
-        value.Should().Be(default);
+        act.Should().Throw<InvalidOperationException>()
+           .And.Message.Should().Be("The Value property cannot be accessed when errors have been recorded. Check IsError before accessing Value.");
     }
 
     [Fact]
@@ -295,11 +297,11 @@ public class ErrorOrTests
     public void ImplicitCastErrorArray_WhenAccessingErrors_ShouldReturnErrorArray()
     {
         // Arrange
-        Error[] errors = new[]
-        {
+        Error[] errors =
+        [
             Error.Validation("User.Name", "Name is too short"),
             Error.Validation("User.Age", "User is too young"),
-        };
+        ];
 
         // Act
         ErrorOr<Person> errorOrPerson = errors;
@@ -331,11 +333,11 @@ public class ErrorOrTests
     public void ImplicitCastErrorArray_WhenAccessingFirstError_ShouldReturnFirstError()
     {
         // Arrange
-        Error[] errors = new[]
-        {
+        Error[] errors =
+        [
             Error.Validation("User.Name", "Name is too short"),
             Error.Validation("User.Age", "User is too young"),
-        };
+        ];
 
         // Act
         ErrorOr<Person> errorOrPerson = errors;
@@ -343,5 +345,66 @@ public class ErrorOrTests
         // Assert
         errorOrPerson.IsError.Should().BeTrue();
         errorOrPerson.FirstError.Should().Be(errors[0]);
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenUsingEmptyConstructor_ShouldThrow()
+    {
+        // Act
+        Func<ErrorOr<int>> action = () => new ErrorOr<int>();
+
+        // Assert
+        action.Should().ThrowExactly<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenEmptyErrorsList_ShouldThrow()
+    {
+        // Act
+        Func<ErrorOr<int>> errorOrInt = () => new List<Error>();
+
+        // Assert
+        var exception = errorOrInt.Should().ThrowExactly<ArgumentException>().Which;
+        exception.Message.Should().Be("Cannot create an ErrorOr<TValue> from an empty collection of errors. Provide at least one error. (Parameter 'errors')");
+        exception.ParamName.Should().Be("errors");
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenEmptyErrorsArray_ShouldThrow()
+    {
+        // Act
+        Func<ErrorOr<int>> errorOrInt = () => Array.Empty<Error>();
+
+        // Assert
+        var exception = errorOrInt.Should().ThrowExactly<ArgumentException>().Which;
+        exception.Message.Should().Be("Cannot create an ErrorOr<TValue> from an empty collection of errors. Provide at least one error. (Parameter 'errors')");
+        exception.ParamName.Should().Be("errors");
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenNullIsPassedAsErrorsList_ShouldThrowArgumentNullException()
+    {
+        Func<ErrorOr<int>> act = () => default(List<Error>)!;
+
+        act.Should().ThrowExactly<ArgumentNullException>()
+           .And.ParamName.Should().Be("errors");
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenNullIsPassedAsErrorsArray_ShouldThrowArgumentNullException()
+    {
+        Func<ErrorOr<int>> act = () => default(Error[])!;
+
+        act.Should().ThrowExactly<ArgumentNullException>()
+           .And.ParamName.Should().Be("errors");
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenValueIsNull_ShouldThrowArgumentNullException()
+    {
+        Func<ErrorOr<int?>> act = () => default(int?);
+
+        act.Should().ThrowExactly<ArgumentNullException>()
+           .And.ParamName.Should().Be("value");
     }
 }

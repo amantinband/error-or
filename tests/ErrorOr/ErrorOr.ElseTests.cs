@@ -13,8 +13,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
-            .Then(num => ConvertToString(num))
+            .Then(Convert.ToInt)
+            .Then(Convert.ToString)
             .Else(errors => $"Error count: {errors.Count}");
 
         // Assert
@@ -30,8 +30,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
-            .Then(num => ConvertToString(num))
+            .Then(Convert.ToInt)
+            .Then(Convert.ToString)
             .Else(errors => $"Error count: {errors.Count}");
 
         // Assert
@@ -47,8 +47,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
-            .Then(num => ConvertToString(num))
+            .Then(Convert.ToInt)
+            .Then(Convert.ToString)
             .Else("oh no");
 
         // Assert
@@ -64,8 +64,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
-            .Then(num => ConvertToString(num))
+            .Then(Convert.ToInt)
+            .Then(Convert.ToString)
             .Else("oh no");
 
         // Assert
@@ -81,8 +81,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
-            .Then(num => ConvertToString(num))
+            .Then(Convert.ToInt)
+            .Then(Convert.ToString)
             .Else(Error.Unexpected());
 
         // Assert
@@ -98,8 +98,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
-            .Then(num => ConvertToString(num))
+            .Then(Convert.ToInt)
+            .Then(Convert.ToString)
             .Else(Error.Unexpected());
 
         // Assert
@@ -115,8 +115,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
-            .Then(num => ConvertToString(num))
+            .Then(Convert.ToInt)
+            .Then(Convert.ToString)
             .Else(errors => Error.Unexpected());
 
         // Assert
@@ -132,8 +132,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
-            .Then(num => ConvertToString(num))
+            .Then(Convert.ToInt)
+            .Then(Convert.ToString)
             .Else(errors => Error.Unexpected());
 
         // Assert
@@ -149,9 +149,9 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
-            .Then(num => ConvertToString(num))
-            .Else(errors => new() { Error.Unexpected() });
+            .Then(Convert.ToInt)
+            .Then(Convert.ToString)
+            .Else(errors => [Error.Unexpected()]);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -166,9 +166,9 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = errorOrString
-            .Then(str => ConvertToInt(str))
-            .Then(num => ConvertToString(num))
-            .Else(errors => new() { Error.Unexpected() });
+            .Then(Convert.ToInt)
+            .Then(Convert.ToString)
+            .Else(errors => [Error.Unexpected()]);
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -183,8 +183,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .Then(str => ConvertToInt(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .Then(Convert.ToInt)
+            .ThenAsync(Convert.ToStringAsync)
             .Else("oh no");
 
         // Assert
@@ -200,8 +200,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .Then(str => ConvertToInt(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .Then(Convert.ToInt)
+            .ThenAsync(Convert.ToStringAsync)
             .Else(errors => $"Error count: {errors.Count}");
 
         // Assert
@@ -217,8 +217,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .Then(str => ConvertToInt(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .Then(Convert.ToInt)
+            .ThenAsync(Convert.ToStringAsync)
             .Else(Error.Unexpected());
 
         // Assert
@@ -234,8 +234,8 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .Then(str => ConvertToInt(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
+            .Then(Convert.ToInt)
+            .ThenAsync(Convert.ToStringAsync)
             .Else(errors => Error.Unexpected());
 
         // Assert
@@ -251,18 +251,12 @@ public class ElseTests
 
         // Act
         ErrorOr<string> result = await errorOrString
-            .Then(str => ConvertToInt(str))
-            .ThenAsync(num => ConvertToStringAsync(num))
-            .Else(errors => new() { Error.Unexpected() });
+            .Then(Convert.ToInt)
+            .ThenAsync(Convert.ToStringAsync)
+            .Else(errors => [Error.Unexpected()]);
 
         // Assert
         result.IsError.Should().BeTrue();
         result.FirstError.Type.Should().Be(ErrorType.Unexpected);
     }
-
-    private static ErrorOr<string> ConvertToString(int num) => num.ToString();
-
-    private static ErrorOr<int> ConvertToInt(string str) => int.Parse(str);
-
-    private static Task<ErrorOr<string>> ConvertToStringAsync(int num) => Task.FromResult(ErrorOrFactory.From(num.ToString()));
 }

@@ -365,7 +365,7 @@ public class ErrorOrInstantiationTests
 
         // Assert
         var exception = errorOrInt.Should().ThrowExactly<ArgumentException>().Which;
-        exception.Message.Should().Be("Cannot create an ErrorOr<TValue> from an empty list of errors. Provide at least one error. (Parameter 'errors')");
+        exception.Message.Should().Be("Cannot create an ErrorOr<TValue> from an empty collection of errors. Provide at least one error. (Parameter 'errors')");
         exception.ParamName.Should().Be("errors");
     }
 
@@ -377,7 +377,7 @@ public class ErrorOrInstantiationTests
 
         // Assert
         var exception = errorOrInt.Should().ThrowExactly<ArgumentException>().Which;
-        exception.Message.Should().Be("Cannot create an ErrorOr<TValue> from an empty array of errors. Provide at least one error. (Parameter 'errors')");
+        exception.Message.Should().Be("Cannot create an ErrorOr<TValue> from an empty collection of errors. Provide at least one error. (Parameter 'errors')");
         exception.ParamName.Should().Be("errors");
     }
 
@@ -397,5 +397,14 @@ public class ErrorOrInstantiationTests
 
         act.Should().ThrowExactly<ArgumentNullException>()
            .And.ParamName.Should().Be("errors");
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenValueIsNull_ShouldThrowArgumentNullException()
+    {
+        Func<ErrorOr<int?>> act = () => default(int?);
+
+        act.Should().ThrowExactly<ArgumentNullException>()
+           .And.ParamName.Should().Be("value");
     }
 }

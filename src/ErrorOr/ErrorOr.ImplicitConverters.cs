@@ -25,16 +25,6 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <exception cref="ArgumentException">Thrown when <paramref name="errors" /> is an empty list.</exception>
     public static implicit operator ErrorOr<TValue>(List<Error> errors)
     {
-        if (errors is null)
-        {
-            throw new ArgumentNullException(nameof(errors));
-        }
-
-        if (errors.Count == 0)
-        {
-            throw new ArgumentException("Cannot create an ErrorOr<TValue> from an empty list of errors. Provide at least one error.", nameof(errors));
-        }
-
         return new ErrorOr<TValue>(errors);
     }
 
@@ -50,11 +40,6 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
             throw new ArgumentNullException(nameof(errors));
         }
 
-        if (errors.Length == 0)
-        {
-            throw new ArgumentException("Cannot create an ErrorOr<TValue> from an empty array of errors. Provide at least one error.", nameof(errors));
-        }
-
-        return new ErrorOr<TValue>(errors.ToList());
+        return new ErrorOr<TValue>([.. errors]);
     }
 }

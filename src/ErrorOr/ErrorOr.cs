@@ -14,6 +14,7 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     /// <summary>
     /// Prevents a default <see cref="ErrorOr"/> struct from being created.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when this method is called.</exception>
     public ErrorOr()
     {
         throw new InvalidOperationException("Default construction of ErrorOr<TValue> is invalid. Please use provided factory methods to instantiate.");
@@ -22,19 +23,16 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     private ErrorOr(Error error)
     {
         _errors = [error];
-        IsError = true;
     }
 
     private ErrorOr(List<Error> errors)
     {
         _errors = errors;
-        IsError = true;
     }
 
     private ErrorOr(TValue value)
     {
         _value = value;
-        IsError = false;
     }
 
     /// <summary>
@@ -44,26 +42,40 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
     [MemberNotNullWhen(true, nameof(Errors))]
     [MemberNotNullWhen(false, nameof(Value))]
     [MemberNotNullWhen(false, nameof(_value))]
-    public bool IsError { get; }
+    public bool IsError => _errors is not null;
 
     /// <summary>
     /// Gets the list of errors. If the state is not error, the list will contain a single error representing the state.
     /// </summary>
-    public List<Error> Errors => IsError ? _errors! : throw new InvalidOperationException("The Errors property cannot be accessed when no errors have been recorded. Check IsError before accessing Errors.");
+    /// <exception cref="InvalidOperationException">Thrown when no errors are present.</exception>
+    public List<Error> Errors => IsError ? _errors : throw new InvalidOperationException("The Errors property cannot be accessed when no errors have been recorded. Check IsError before accessing Errors.");
 
     /// <summary>
     /// Gets the list of errors. If the state is not error, the list will be empty.
     /// </summary>
-    public List<Error> ErrorsOrEmptyList => IsError ? _errors! : [];
+    public List<Error> ErrorsOrEmptyList => IsError ? _errors : EmptyErrors.Instance;
 
     /// <summary>
     /// Gets the value.
     /// </summary>
-    public TValue Value => _value!;
+    /// <exception cref="InvalidOperationException">Thrown when no value is present.</exception>
+    public TValue Value
+    {
+        get
+        {
+            if (IsError)
+            {
+                throw new InvalidOperationException("The Value property cannot be accessed when errors have been recorded. Check IsError before accessing Value.");
+            }
+
+            return _value;
+        }
+    }
 
     /// <summary>
     /// Gets the first error.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when no errors are present.</exception>
     public Error FirstError
     {
         get
@@ -73,7 +85,7 @@ public readonly partial record struct ErrorOr<TValue> : IErrorOr<TValue>
                 throw new InvalidOperationException("The FirstError property cannot be accessed when no errors have been recorded. Check IsError before accessing FirstError.");
             }
 
-            return _errors![0];
+            return _errors[0];
         }
     }
 

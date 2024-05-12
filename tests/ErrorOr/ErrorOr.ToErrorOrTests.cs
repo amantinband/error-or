@@ -46,4 +46,15 @@ public class ToErrorOrTests
         result.IsError.Should().BeTrue();
         result.Errors.Should().BeEquivalentTo(errors);
     }
+
+    [Fact]
+    public void ArrayOfErrorsToErrorOr_WhenAccessingErrors_ShouldReturnSimilarErrors()
+    {
+        Error[] errors = [Error.Unauthorized(), Error.Validation()];
+
+        ErrorOr<int> result = errors.ToErrorOr<int>();
+
+        result.IsError.Should().BeTrue();
+        result.Errors.Should().Equal(errors);
+    }
 }

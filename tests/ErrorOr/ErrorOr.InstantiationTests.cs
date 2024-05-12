@@ -144,17 +144,18 @@ public class ErrorOrInstantiationTests
     }
 
     [Fact]
-    public void CreateFromErrorList_WhenAccessingValue_ShouldReturnDefault()
+    public void CreateFromErrorList_WhenAccessingValue_ShouldThrowInvalidOperationException()
     {
         // Arrange
         List<Error> errors = new() { Error.Validation("User.Name", "Name is too short") };
         ErrorOr<Person> errorOrPerson = ErrorOr<Person>.From(errors);
 
         // Act
-        Person value = errorOrPerson.Value;
+        var act = () => errorOrPerson.Value;
 
         // Assert
-        value.Should().Be(default);
+        act.Should().Throw<InvalidOperationException>()
+           .And.Message.Should().Be("The Value property cannot be accessed when errors have been recorded. Check IsError before accessing Value.");
     }
 
     [Fact]
@@ -247,16 +248,17 @@ public class ErrorOrInstantiationTests
     }
 
     [Fact]
-    public void ImplicitCastError_WhenAccessingValue_ShouldReturnDefault()
+    public void ImplicitCastError_WhenAccessingValue_ShouldThrowInvalidOperationException()
     {
         // Arrange
         ErrorOr<Person> errorOrPerson = Error.Validation("User.Name", "Name is too short");
 
         // Act
-        Person value = errorOrPerson.Value;
+        var act = () => errorOrPerson.Value;
 
         // Assert
-        value.Should().Be(default);
+        act.Should().Throw<InvalidOperationException>()
+           .And.Message.Should().Be("The Value property cannot be accessed when errors have been recorded. Check IsError before accessing Value.");
     }
 
     [Fact]
@@ -362,7 +364,9 @@ public class ErrorOrInstantiationTests
         Func<ErrorOr<int>> errorOrInt = () => new List<Error>();
 
         // Assert
-        errorOrInt.Should().ThrowExactly<InvalidOperationException>();
+        var exception = errorOrInt.Should().ThrowExactly<ArgumentException>().Which;
+        exception.Message.Should().Be("Cannot create an ErrorOr<TValue> from an empty list of errors. Provide at least one error. (Parameter 'errors')");
+        exception.ParamName.Should().Be("errors");
     }
 
     [Fact]
@@ -372,6 +376,26 @@ public class ErrorOrInstantiationTests
         Func<ErrorOr<int>> errorOrInt = () => Array.Empty<Error>();
 
         // Assert
-        errorOrInt.Should().ThrowExactly<InvalidOperationException>();
+        var exception = errorOrInt.Should().ThrowExactly<ArgumentException>().Which;
+        exception.Message.Should().Be("Cannot create an ErrorOr<TValue> from an empty array of errors. Provide at least one error. (Parameter 'errors')");
+        exception.ParamName.Should().Be("errors");
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenNullIsPassedAsErrorsList_ShouldThrowArgumentNullException()
+    {
+        Func<ErrorOr<int>> act = () => default(List<Error>)!;
+
+        act.Should().ThrowExactly<ArgumentNullException>()
+           .And.ParamName.Should().Be("errors");
+    }
+
+    [Fact]
+    public void CreateErrorOr_WhenNullIsPassedAsErrorsArray_ShouldThrowArgumentNullException()
+    {
+        Func<ErrorOr<int>> act = () => default(Error[])!;
+
+        act.Should().ThrowExactly<ArgumentNullException>()
+           .And.ParamName.Should().Be("errors");
     }
 }

@@ -3,12 +3,24 @@
 <Project>
 
   <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <LangVersion>12.0</LangVersion>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Amichai Mantinband</Authors>
+    <PackageIcon>icon-square.png</PackageIcon>
+    <PackageTags>Result,Results,ErrorOr,Error,Handling</PackageTags>
+    <PackageProjectUrl>https://github.com/amantinband/error-or</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <licenses>https://opensource.org/licenses/MIT</licenses>
+    <RepositoryUrl>https://github.com/amantinband/error-or</RepositoryUrl>
+    <PackageOutputPath>../../artifacts/</PackageOutputPath>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>

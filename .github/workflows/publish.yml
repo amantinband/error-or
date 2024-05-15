@@ -7,18 +7,19 @@ on:
         paths:
             - "src/**"
 jobs:
-    publish:
-        name: build, pack & publish
-        runs-on: windows-latest
-        steps:
-            - uses: actions/checkout@v2
-            - name: Setup dotnet
-              uses: actions/setup-dotnet@v1
-              with:
-                  dotnet-version: 8.0.100
-
-            # Publish
-            - name: Package
-              run: dotnet pack -c Release src/ErrorOr.csproj
-            - name: Publish
-              run: dotnet nuget push .\artifacts\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+  publish:
+    name: Build, Pack & Publish
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        project: ['ErrorOr', 'ErrorOr.AspNetCore']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.0.100'
+      - name: Package
+        run: dotnet pack -c Release src/${{ matrix.project }}/${{ matrix.project }}.csproj
+      - name: Publish
+        run: dotnet nuget push .\artifacts\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

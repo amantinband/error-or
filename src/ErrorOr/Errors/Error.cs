@@ -10,8 +10,7 @@ public readonly record struct Error
         Code = code;
         Description = description;
         Type = type;
-        NumericType = (int)type;
-        Metadata = metadata;
+        Metadata = metadata ?? EmptyMetadata.Instance;
     }
 
     /// <summary>
@@ -32,12 +31,12 @@ public readonly record struct Error
     /// <summary>
     /// Gets the numeric value of the type.
     /// </summary>
-    public int NumericType { get; }
+    public int NumericType => (int)Type;
 
     /// <summary>
     /// Gets the metadata.
     /// </summary>
-    public Dictionary<string, object>? Metadata { get; }
+    public Dictionary<string, object> Metadata { get; }
 
     /// <summary>
     /// Creates an <see cref="Error"/> of type <see cref="ErrorType.Failure"/> from a code and description.

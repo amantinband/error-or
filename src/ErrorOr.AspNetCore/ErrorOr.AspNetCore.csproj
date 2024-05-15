@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>ErrorOr.AspNetCore</PackageId>
+    <Version>3.0.0-alpha1</Version>
+    <PackageTags>Result,Results,ErrorOr,Error,Handling,AspNetCore</PackageTags>
+    <Description>A simple, fluent discriminated union of an error or a result and ASP.NET specific utilities.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../assets/icon-square.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <AdditionalFiles Include="../../Stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ErrorOr\ErrorOr.csproj" />
+  </ItemGroup>
+
+</Project>

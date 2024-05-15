@@ -1,7 +1,7 @@
 namespace Tests;
 
-using ErrorOr;
 using FluentAssertions;
+using global::ErrorOr;
 
 public class ErrorOrInstantiationTests
 {

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <PackageId>ErrorOr</PackageId>
+    <Version>3.0.0-alpha1</Version>
+    <PackageTags>Result,Results,ErrorOr,Error,Handling</PackageTags>
+    <Description>A simple, fluent discriminated union of an error or a result.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../assets/icon-square.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <AdditionalFiles Include="../../Stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference
+      Include="Microsoft.Bcl.HashCode"
+      Version="1.1.1"
+      Condition="'$(TargetFramework)' == 'netstandard2.0'"
+    />
+    <PackageReference Include="Nullable" Version="1.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

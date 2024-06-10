@@ -84,6 +84,16 @@ public class ErrorTests
     }
 
     [Fact]
+    public void CreateError_WhenTooManyRequestsError_ShouldHaveErrorTypeTooManyRequests()
+    {
+        // Act
+        Error error = Error.TooManyRequests(ErrorCode, ErrorDescription, Dictionary);
+
+        // Assert
+        ValidateError(error, expectedErrorType: ErrorType.TooManyRequests);
+    }
+
+    [Fact]
     public void CreateError_WhenCustomType_ShouldHaveCustomErrorType()
     {
         // Act

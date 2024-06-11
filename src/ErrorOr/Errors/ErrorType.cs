@@ -12,4 +12,12 @@ public enum ErrorType
     NotFound,
     Unauthorized,
     Forbidden,
+    Gone,
+    PreconditionFailed,
+    UnsupportedMediaType,
+    UnprocessableEntity,
+    UnavailableForLegalReasons,
+    BadGateway,
+    ServiceUnavailable,
+    GatewayTimeout,
 }

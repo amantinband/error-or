@@ -5,15 +5,14 @@ namespace ErrorOr;
 
 public class ErrorOrOptions
 {
-    public static readonly ErrorOrOptions Instance = new();
+    public static ErrorOrOptions Instance { get; } = new();
 
-    public bool IncludeMetadataInProblemDetails { get; set; } = false;
-    public List<Func<List<Error>, IResult?>> ErrorListToResultMapper { get; set; } = [];
-    public List<Func<Error, IResult?>> ErrorToResultMapper { get; set; } = [];
-    public List<Func<List<Error>, IActionResult?>> ErrorListToActionResultMapper { get; set; } = [];
-    public List<Func<Error, IActionResult?>> ErrorToActionResultMapper { get; set; } = [];
-    public List<Func<List<Error>, ProblemDetails?>> ErrorListToProblemDetailsMapper { get; set; } = [];
-    public List<Func<Error, ProblemDetails?>> ErrorToProblemDetailsMapper { get; set; } = [];
-    public List<Func<Error, int?>> ErrorToStatusCodeMapper { get; set; } = [];
-    public List<Func<Error, string?>> ErrorToTitleMapper { get; set; } = [];
+    public bool IncludeMetadata { get; set; }
+    public bool UseProblemDetailsFactoryInMvc { get; set; }
+    public bool UseFirstErrorAsLeadingType { get; set; }
+    public Func<List<Error>, IActionResult>? CustomToErrorActionResult { get; set; }
+    public Func<List<Error>, IResult>? CustomToErrorResult { get; set; }
+    public Func<List<Error>, ProblemDetailsPrototype>? CustomCreatePrototype { get; set; }
+    public Dictionary<ErrorType, ProblemDetailInfo> ErrorDefaults { get; set; } =
+        new (ErrorOr.ErrorDefaults.DefaultMappings);
 }

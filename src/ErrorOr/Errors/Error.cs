@@ -1,11 +1,15 @@
+using System.Text.Json.Serialization;
+using ErrorOr.JsonSerialization;
+
 namespace ErrorOr;
 
 /// <summary>
 /// Represents an error.
 /// </summary>
+[JsonConverter(typeof(ErrorConverter))]
 public readonly record struct Error
 {
-    private Error(string code, string description, ErrorType type, Dictionary<string, object>? metadata)
+    public Error(string code, string description, ErrorType type, Dictionary<string, object>? metadata)
     {
         Code = code;
         Description = description;
@@ -140,23 +144,17 @@ public readonly record struct Error
     public bool Equals(Error other)
     {
         if (Type != other.Type ||
-            NumericType != other.NumericType ||
             Code != other.Code ||
             Description != other.Description)
         {
             return false;
         }
 
-        if (Metadata is null)
-        {
-            return other.Metadata is null;
-        }
-
-        return other.Metadata is not null && CompareMetadata(Metadata, other.Metadata);
+        return CompareMetadata(Metadata, other.Metadata);
     }
 
     public override int GetHashCode() =>
-        Metadata is null ? HashCode.Combine(Code, Description, Type, NumericType) : ComposeHashCode();
+        Metadata is null ? HashCode.Combine(Code, Description, Type) : ComposeHashCode();
 
     private int ComposeHashCode()
     {
@@ -167,9 +165,8 @@ public readonly record struct Error
         hashCode.Add(Code);
         hashCode.Add(Description);
         hashCode.Add(Type);
-        hashCode.Add(NumericType);
 
-        foreach (var keyValuePair in Metadata!)
+        foreach (var keyValuePair in Metadata)
         {
             hashCode.Add(keyValuePair.Key);
             hashCode.Add(keyValuePair.Value);

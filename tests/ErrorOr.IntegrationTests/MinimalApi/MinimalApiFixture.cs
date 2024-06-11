@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ErrorOr.IntegrationTests.MinimalApi;
 
-public sealed class MinimalApiFixture : IAsyncLifetime
+public sealed class MinimalApiFixture : IApiFixture<MinimalApiFixture>, IAsyncLifetime
 {
     private readonly WebApplication _app;
 

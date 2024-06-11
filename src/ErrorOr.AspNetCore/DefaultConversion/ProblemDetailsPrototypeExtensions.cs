@@ -70,6 +70,7 @@ public static class ProblemDetailsPrototypeExtensions
     {
         var problemDetails = new ValidationProblemDetails
         {
+            Type = prototype.Type,
             Status = prototype.StatusCode,
             Detail = prototype.Detail,
             Instance = prototype.Instance,

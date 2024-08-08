@@ -55,3 +55,26 @@ errorOr.FailIf(x => x > 0, Error.Failure());
 -public static async Task<ErrorOr<TValue>> ThenAsync<TValue>(this Task<ErrorOr<TValue>> errorOr, Func<TValue, Task> action)
 +public static async Task<ErrorOr<TValue>> ThenDoAsync<TValue>(this Task<ErrorOr<TValue>> errorOr, Func<TValue, Task> action)
 ```
+
+## [2.1.0] - 2024-08-08
+
+### Added
+
+- Added `FailIf` `Func<TValue, Error>` overloads (thanks [@ahmtsen](https://github.com/ahmtsen)!)
+
+```cs
+public async Task<ErrorOr<TValue>> FailIfAsync(Func<TValue, Task<bool>> onValue, Func<TValue, Task<Error>> errorBuilder)
+```
+
+```cs
+public static async Task<ErrorOr<TValue>> FailIfAsync<TValue>(
+    this Task<ErrorOr<TValue>> errorOr,
+    Func<TValue, Task<bool>> onValue,
+    Func<TValue, Task<Error>> errorBuilder)
+```
+
+```cs
+// the value can now be used to build the error
+ErrorOr<int> result = errorOrInt
+    .FailIf(num => num > 3, (num) => Error.Failure(description: $"{num} is greater than 3"));
+```

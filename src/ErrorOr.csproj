@@ -5,7 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <DocumentationFile>bin\$(Configuration)\netstandard2.0\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <DocumentationFile>bin\$(Configuration)\net8.0\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -26,7 +32,8 @@
   <ItemGroup>
     <None Include="../assets/icon-square.png" Pack="true" Visible="false" PackagePath="" />
     <None Include="../README.md" Pack="true" PackagePath="" />
-    <None Include="bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml" Pack="true" PackagePath="lib\$(TargetFramework)\" />
+    <None Include="bin\$(Configuration)\net8.0\$(AssemblyName).xml" Pack="true" PackagePath="lib\net8.0\" />
+    <None Include="bin\$(Configuration)\netstandard2.0\$(AssemblyName).xml" Pack="true" PackagePath="lib\netstandard2.0\" />
     <None Include="Stylecop.json" />
     <AdditionalFiles Include="Stylecop.json" />
   </ItemGroup>

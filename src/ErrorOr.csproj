@@ -1,19 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <DocumentationFile>bin\$(Configuration)\netstandard2.0\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <DocumentationFile>bin\$(Configuration)\net8.0\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>
-
   <PropertyGroup>
     <PackageId>ErrorOr</PackageId>
     <Version>2.1.0</Version>
@@ -28,16 +19,12 @@
     <PackageOutputPath>../artifacts/</PackageOutputPath>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="../assets/icon-square.png" Pack="true" Visible="false" PackagePath="" />
     <None Include="../README.md" Pack="true" PackagePath="" />
-    <None Include="bin\$(Configuration)\net8.0\$(AssemblyName).xml" Pack="true" PackagePath="lib\net8.0\" />
-    <None Include="bin\$(Configuration)\netstandard2.0\$(AssemblyName).xml" Pack="true" PackagePath="lib\netstandard2.0\" />
     <None Include="Stylecop.json" />
     <AdditionalFiles Include="Stylecop.json" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference
       Include="Microsoft.Bcl.HashCode"
@@ -49,5 +36,4 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
 </Project>

@@ -305,21 +305,21 @@ public ErrorOr<int> MultipleErrorsToErrorOr()
 ```
 
 ```cs
-public async Tak<ErrorOr<int>> GetValueAsync()
+public async Task<ErrorOr<int>> GetValueAsync()
 {
     return await ErrorOrFactory.FromAsync(5);
 }
 ```
 
 ```cs
-public async Tak<ErrorOr<int>> SingleErrorToErrorOrAsync()
+public async Task<ErrorOr<int>> SingleErrorToErrorOrAsync()
 {
     return await ErrorOrFactory.FromAsync<int>(Error.Unexpected());
 }
 ```
 
 ```cs
-public async Tak<ErrorOr<int>> MultipleErrorsToErrorOrAsync()
+public async Task<ErrorOr<int>> MultipleErrorsToErrorOrAsync()
 {
     return await ErrorOrFactory.FromAsync([
         Error.Validation(description: "Invalid Name"),
@@ -862,7 +862,7 @@ You can use the `Error.NumericType` method to retrieve the numeric type of the e
 ```cs
 var errorMessage = Error.NumericType switch
 {
-    MyErrorType.ShouldNeverHappen => "Consider replacing dev team",
+    MyErrorTypes.ShouldNeverHappen => "Consider replacing dev team",
     _ => "An unknown error occurred.",
 };
 ```
